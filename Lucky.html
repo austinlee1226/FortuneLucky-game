@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 V0.025</title>
-    <style>
-        /* 樣式延用 V0.022 穩定框架 */
+    
+    <title>吉運臨門 - 2026 你的開運籤詩</title>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://austinlee1226.github.io/FortuneLucky-game/Lucky.html">
+    <meta property="og:title" content="吉運臨門 - 2026 你的開運籤詩">
+    <meta property="og:description" content="我剛抽到了好運籤！快來測測你的今日運勢。">
+    <meta property="og:image" content=""> <style>
+        /* 樣式沿用 V0.025 穩定框架 */
         :root { --bg-red: #b71c1c; --gold: #ffd700; --paper: #fffdf5; --win-color: #ffeb3b; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #1a1a1a; margin: 0; display: flex; justify-content: center; align-items: center; height: 100dvh; font-family: -apple-system, "Microsoft JhengHei", sans-serif; overflow: hidden; }
@@ -73,7 +78,6 @@
 </div>
 
 <script>
-    // 資料延用 V0.024
     const fortuneData = [
         { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
         { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
@@ -81,7 +85,7 @@
         { id: 4, star: 2, type: "小吉", intro: "正站在變革的交叉路口。建議放下舊有的思維，用開放心態迎接。", items: ["❤️ 換個交友圈，會遇到驚艷奇緣。", "💰 出現轉機，有機會轉虧為盈。", "☘️ 逢凶化吉，關鍵時刻總能過關。", "✈️ 隨興的旅程會帶給你驚喜。", "💼 轉換視角，難關立刻變成機會。"] },
         { id: 5, star: 3, type: "中吉", intro: "適合團隊合作而非單打獨鬥。主動伸出友誼之手，透過分享達成目標。", items: ["❤️ 真誠的告白與承諾，在此刻最動人。", "💰 透過異業合作能分到大利潤。", "☘️ 貴人多在社交場合，請多露面。", "✈️ 與合適夥伴同遊，樂趣會翻倍。", "💼 資源整合能力是職場所向披靡。"] },
         { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利。"] },
-        { id: 7, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 請保持謹謹慎，避免衝動購物。", "☘️ 靈光閃現瞬間，就是轉運開始。", "✈️ 請注意安全，並預留備案。", "💼 專注處理核心業務。"] },
+        { id: 7, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 請保持謹慎，避免衝動購物。", "☘️ 靈光閃現瞬間，就是轉運開始。", "✈️ 請注意安全，並預留備案。", "💼 專注處理核心業務。"] },
         { id: 8, star: 2, type: "小吉", intro: "正處於打地基的關鍵期。建議維持現有的韌性，小步快跑地穩定成長。", items: ["❤️ 慢火熬煮的感情，比速食更持久。", "💰 聚沙成塔，每一分都是金礦。", "☘️ 你的勤奮將換來一份特別好運。", "✈️ 適合勞動型旅行，強健體魄。", "💼 步步為營，專業度讓對手敬佩。"] },
         { id: 10, star: 1, type: "吉", intro: "適合檢視過往、修正偏差的時機。建議稍微放慢節奏，把能量聚焦。", items: ["❤️ 檢視彼此關係，調整互動頻率。", "💰 重新配置理財，找出潛在風險。", "☘️ 避開鋒芒紛爭，就是最好轉運。", "✈️ 適合短途小憩，讓身心快速充電。", "💼 優化架構，將繁瑣流程重置。"] },
         { id: 9, star: 4, type: "大吉", intro: "正迎來一段收穫的高峰期。建議放鬆心情去感受成就，並與他人共享。", items: ["❤️ 圓滿時刻，適合談論終身大事。", "💰 財富亨通，有點石成金手感。", "☘️ 驚喜連連，充滿開心的好消息。", "✈️ 盡興而歸，一場完美的盛宴。", "💼 功成名就，地位已確立。"] }
@@ -89,8 +93,34 @@
 
     let state = "READY";
     function handleButtonClick() {
-        if (state === "FINISHED") { resetUI(); setTimeout(startDrawing, 350); }
-        else if (state === "READY") { startDrawing(); }
+        if (state === "FINISHED") { 
+            shareAndReset(); 
+        } else if (state === "READY") { 
+            startDrawing(); 
+        }
+    }
+
+    // 真實分享功能：點擊「分享重抽」會彈出手機分享選單
+    async function shareAndReset() {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: '吉運臨門 - 2026 你的開運籤詩',
+                    text: '我剛抽到了好運籤！快來測測你的今日運勢。',
+                    url: window.location.href // 自動抓取目前的 Lucky.html 網址
+                });
+                resetUI();
+                setTimeout(startDrawing, 350);
+            } catch (err) {
+                // 如果玩家關閉分享視窗，依然可以重新開始抽獎
+                resetUI();
+                setTimeout(startDrawing, 350);
+            }
+        } else {
+            // PC 瀏覽器不支援時的備選方案
+            resetUI();
+            setTimeout(startDrawing, 350);
+        }
     }
 
     function resetUI() {
@@ -156,8 +186,6 @@
             footerHint.innerText = "請截圖至粉絲團貼圖留言換取獎勵"; footerHint.style.opacity = "1";
         }
         state = "FINISHED"; 
-        
-        // 核心修改：更新按鈕文字為「分享重抽」
         btn.innerText = "分享重抽"; 
         btn.classList.remove('hidden');
     }
