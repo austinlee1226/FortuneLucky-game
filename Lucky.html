@@ -38,18 +38,19 @@
         .star-rating { color: var(--gold); font-size: 1.15rem; letter-spacing: 4px; line-height: 1; min-height: 1.15rem; }
         .star-rating span { display: inline-block; transform: scale(0); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .star-rating span.pop { transform: scale(1); }
-        .fortune-header { color: #b71c1c; font-size: 2rem; margin: 0; line-height: 1.1; }
+        .fortune-header { color: #b71c1c; font-size: 2rem; margin: 0; line-height: 1.1; opacity: 0; transition: opacity 0.4s; }
+        .fortune-header.show { opacity: 1; }
         
-        .fortune-intro { font-size: 0.9rem; color: #333; line-height: 1.4; margin: 15px 0; font-weight: bold; flex-shrink: 0; }
+        .fortune-intro { font-size: 0.9rem; color: #333; line-height: 1.4; margin: 15px 0; font-weight: bold; flex-shrink: 0; opacity: 0; transition: opacity 0.4s; }
+        .fortune-intro.show { opacity: 1; }
         .details-list { text-align: left; padding: 0; list-style: none; margin: 0; flex-grow: 1; overflow-y: auto; }
         .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
         .details-list li.reveal { opacity: 1; transform: translateY(0); }
 
         .draw-btn-large { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer; }
         
-        .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; }
-        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; transition: opacity 0.5s ease, transform 0.5s ease; display: flex !important; }
-        .button-group:not(.show) { opacity: 0; display: none !important; }
+        .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.5s; }
+        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
         
         .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; text-align: center; text-decoration: none; }
         .btn-win-claim { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #ffffff; box-shadow: 0 4px 0 #5d4037; }
@@ -101,18 +102,13 @@
 
 <script>
     const fortuneData = [
-        { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
-        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
-        { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間，靜待時機成熟。", items: ["❤️ 緣分急不來，打理好自己最重要。", "💰 適合保守理財，固守資金流。", "☘️ 運氣正在排隊，請平常心等待。", "✈️ 不宜遠行，適合在家深度休息。", "💼 蓄勢待發，沈默是為了爆發。"] },
-        { id: 4, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "💼 勢如破竹，進展極其順利。"] },
-        { id: 5, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 支出請保持謹慎。", "💼 專注處理核心業務。"] }
+        { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 愛情全開，正緣出現機率極高。", "💰 財富精準，有意外回報。", "☘️ 強運當頭，想做的事都有貴人助。", "✈️ 旅行適合，會在旅途收穫靈感。", "💼 事業爆表，展現領導力。"] },
+        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調。", items: ["❤️ 愛情穩定的陪伴。", "💰 財富正在穩健增長。", "☘️ 強運處處小確幸。", "✈️ 旅行適合慢活節奏。", "💼 事業根基紮實。"] },
+        { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間。", items: ["❤️ 愛情打理好自己最重要。", "💰 財富適合保守理財。", "☘️ 強運正在排隊等待。", "✈️ 旅行適合深度休息。", "💼 事業沈默是為了爆發。"] }
     ];
 
     let lastResult = "";
     let currentSerial = "";
-    // 請確認您的 ID，深度連結不加 @
-    const OA_ID = "263pizut"; 
-    const LINE_OA_BASE = "https://line.me/R/oaMessage/" + OA_ID + "/"; 
 
     function generateSerial() {
         const now = new Date();
@@ -127,7 +123,6 @@
     }
 
     function resetUIAndRedraw() {
-        // 1. 重設所有狀態
         document.getElementById('after-draw-group').classList.remove('show');
         document.getElementById('scroll').classList.remove('active');
         document.getElementById('win-info-group').classList.remove('show');
@@ -136,30 +131,15 @@
         document.getElementById('cat-actor').classList.remove('fade');
         document.getElementById('res-stars').innerHTML = "";
         document.getElementById('res-details').innerHTML = "";
+        document.getElementById('res-type').classList.remove('show');
+        document.getElementById('res-intro').classList.remove('show');
         document.getElementById('footer-hint-text').innerText = "今日運勢好不好，一抽就知道";
         
         const mainBtn = document.getElementById('main-action-btn');
         mainBtn.innerText = "再抽一次";
         mainBtn.classList.remove('btn-win-claim');
-        mainBtn.onclick = resetUIAndRedraw; // 恢復預設行為
         
-        // 2. 直接開始抽籤動畫
-        startDrawing();
-    }
-
-    function setupWinUI(serial) {
-        const mainBtn = document.getElementById('main-action-btn');
-        mainBtn.innerText = "點我領取獎勵 🎁";
-        mainBtn.classList.add('btn-win-claim');
-        mainBtn.onclick = () => {
-            const msg = `您好！我抽中了超大吉！\n我的領獎序號是：【${serial}】`;
-            window.location.href = LINE_OA_BASE + "??" + encodeURIComponent(msg);
-        };
-        document.getElementById('serial-display').innerText = `序號：${serial}`;
-        document.getElementById('main-title').style.opacity = "0"; 
-        document.getElementById('reward-text').style.opacity = "0"; 
-        document.getElementById('win-info-group').classList.add('show');
-        document.getElementById('footer-hint-text').innerText = "請截圖至 LINE 兌換";
+        setTimeout(startDrawing, 500);
     }
 
     async function startDrawing() {
@@ -175,25 +155,20 @@
         cat.classList.add('shaking');
         fHint.style.opacity = "0";
 
-        // 亂數抽取
         const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
         lastResult = pick.type;
 
+        // 1. 貓咪搖晃動畫 (2.5秒)
         await new Promise(r => setTimeout(r, 2500));
         cat.classList.remove('shaking');
         cat.classList.add('fade');
         hint.style.opacity = "0";
 
-        document.getElementById('res-type').innerText = pick.type;
-        document.getElementById('res-intro').innerText = pick.intro;
-
-        const high = ["超大吉", "大吉", "中吉"];
-        if (!high.includes(pick.type)) afterGroup.classList.add('single-btn'); 
-        else afterGroup.classList.remove('single-btn'); 
-
+        // 2. 出現捲軸
         scroll.classList.add('active');
-        await new Promise(r => setTimeout(r, 600)); 
+        await new Promise(r => setTimeout(r, 800)); 
 
+        // 3. 星級依序跑完
         const sCont = document.getElementById('res-stars');
         for (let i = 0; i < pick.star; i++) {
             const span = document.createElement('span'); span.innerText = "★";
@@ -202,19 +177,49 @@
             await new Promise(r => setTimeout(r, 400)); 
         }
 
-        // 抽中超大吉時產生成序號並顯示 UI
-        if (pick.type === "超大吉") {
-            currentSerial = generateSerial();
-            setupWinUI(currentSerial);
-        }
+        // 4. 顯示大標題 (超大吉/大吉...)
+        document.getElementById('res-type').innerText = pick.type;
+        document.getElementById('res-type').classList.add('show');
+        await new Promise(r => setTimeout(r, 500));
 
+        // 5. 顯示導語
+        document.getElementById('res-intro').innerText = pick.intro;
+        document.getElementById('res-intro').classList.add('show');
+        await new Promise(r => setTimeout(r, 500));
+
+        // 6. 依序出現 愛情/財富/強運/旅行/事業
         const dCont = document.getElementById('res-details');
         for (const item of pick.items) {
             const li = document.createElement('li'); li.innerText = item;
             dCont.appendChild(li);
             setTimeout(() => li.classList.add('reveal'), 50);
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 500));
         }
+
+        // 7. 最後才顯示頂部的 恭喜中獎及序號 (如果是超大吉)
+        if (pick.type === "超大吉") {
+            currentSerial = generateSerial();
+            const mainBtn = document.getElementById('main-action-btn');
+            mainBtn.innerText = "點我領取獎勵 🎁";
+            mainBtn.classList.add('btn-win-claim');
+            mainBtn.onclick = () => {
+                const msg = `您好！我抽中了超大吉！\n我的領獎序號是：【${currentSerial}】`;
+                // 使用 R/msg/text 格式，最穩定喚起 App
+                window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
+            };
+            document.getElementById('serial-display').innerText = `序號：${currentSerial}`;
+            
+            // 觸發頂部動畫
+            document.getElementById('main-title').style.opacity = "0"; 
+            document.getElementById('reward-text').style.opacity = "0"; 
+            document.getElementById('win-info-group').classList.add('show');
+            fHint.innerText = "請截圖至 LINE 兌換";
+            fHint.style.opacity = "1";
+        }
+
+        // 8. 顯示底部按鈕
+        if (!["超大吉", "大吉", "中吉"].includes(pick.type)) afterGroup.classList.add('single-btn'); 
+        else afterGroup.classList.remove('single-btn'); 
         afterGroup.classList.add('show');
     }
 </script>
