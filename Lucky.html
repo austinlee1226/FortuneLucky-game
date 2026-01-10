@@ -46,19 +46,41 @@
         .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
         .details-list li.reveal { opacity: 1; transform: translateY(0); }
 
-        .draw-btn-large { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer; }
+        /* 統一按鈕基礎樣式 */
+        .draw-btn-large, .btn-common { 
+            background: linear-gradient(180deg, #ffeb3b, #fbc02d); 
+            color: #b71c1c; 
+            border: none; 
+            font-weight: 900; 
+            border-radius: 50px; 
+            box-shadow: 0 6px 0 #795548; 
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .draw-btn-large { padding: 16px 60px; font-size: 1.5rem; }
         
         .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; }
-        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; display: flex !important; transition: all 0.5s ease; }
+        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
         
-        .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; transition: all 0.2s; text-align: center; }
+        /* 當有兩個按鈕時的樣式 */
+        .btn-common { flex: 1; padding: 12px 0; font-size: 1.1rem; box-shadow: 0 4px 0 #795548; }
         .btn-common:active { transform: translateY(2px); box-shadow: 0 2px 0 #795548; }
 
-        /* 領獎按鈕狀態 */
+        /* 【關鍵優化】當只有一個按鈕時，回歸大按鈕外觀，不撐滿全寬 */
+        .single-btn { justify-content: center; }
+        .single-btn .btn-common { 
+            flex: none; 
+            width: auto; 
+            padding: 14px 50px; 
+            font-size: 1.3rem;
+            box-shadow: 0 5px 0 #795548;
+        }
+
         .btn-win-claim { background: var(--btn-win); color: #ffffff; box-shadow: 0 4px 0 #5d4037; }
         .btn-green-status { background: var(--btn-green) !important; color: white !important; box-shadow: 0 4px 0 #1b5e20 !important; }
 
-        .single-btn #share-btn-text { display: none !important; }
         .hidden { display: none !important; }
         .footer-hint { color: white; font-size: 0.85rem; margin-top: 10px; opacity: 1; transition: opacity 0.4s; text-align: center; }
 
@@ -102,37 +124,24 @@
 <script>
     const fortuneData = [
         { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
-        // ... (其他數據保持不變)
         { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
         { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間，靜待時機成熟。", items: ["❤️ 緣分急不來，打理好自己最重要。", "💰 適合保守理財，固守資金流。", "☘️ 運氣正在排隊，請平常心等待。", "✈️ 不宜遠行，適合在家深度休息。", "💼 蓄勢待發，沈默是為了爆發。"] },
-        { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利。"] },
+        { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利. "] },
         { id: 7, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 支出請保持謹慎，避免衝動購物。", "☘️ 靈光閃現瞬間，就是轉運開始。", "✈️ 出行注意安全，並預留備案。", "💼 專注處理核心業務。"] }
     ];
 
     let currentSerial = "";
-    let stepStatus = 1; // 1: 初始, 2: 已複製可跳轉
+    let stepStatus = 1; 
     const LINE_OA_URL = "https://lin.ee/4lqVqd3"; 
 
-    function generateSerial() {
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        let result = '';
-        for (let i = 0; i < 9; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-        return result;
-    }
-
-    // 核心邏輯：複製與按鈕轉換
     async function handleClaimProcess(btn) {
         if (stepStatus === 1) {
-            // 執行複製字串模板
             const copyTemplate = `您好！我抽中了五星超大吉！領取序號是：(${currentSerial})`;
             try {
                 await navigator.clipboard.writeText(copyTemplate);
-                
-                // 進入階段 2 & 3
                 stepStatus = 2;
                 btn.innerText = "前往 LINE 領取 🎁";
                 btn.classList.add('btn-green-status');
-                
                 const fHint = document.getElementById('footer-hint-text');
                 fHint.innerText = "✅ 訊息已複製，請至官方 LINE 發送";
                 fHint.style.color = "#81c784";
@@ -141,7 +150,6 @@
                 alert("複製失敗，請手動記下序號：" + currentSerial);
             }
         } else {
-            // 跳轉至 LINE
             window.location.href = LINE_OA_URL;
         }
     }
@@ -149,7 +157,7 @@
     function resetUIAndRedraw() {
         stepStatus = 1;
         const afterGroup = document.getElementById('after-draw-group');
-        afterGroup.classList.remove('show');
+        afterGroup.classList.remove('show', 'single-btn');
         document.getElementById('scroll').classList.remove('active');
         document.getElementById('win-info').classList.remove('show');
         document.getElementById('main-title').style.opacity = "1";
@@ -164,6 +172,9 @@
         mainBtn.classList.remove('btn-win-claim', 'btn-green-status');
         mainBtn.onclick = resetUIAndRedraw;
         
+        const shareBtn = document.getElementById('share-btn-text');
+        shareBtn.classList.remove('hidden');
+
         const fHint = document.getElementById('footer-hint-text');
         fHint.innerText = "今日運勢好不好，一抽就知道";
         fHint.style.color = "white";
@@ -178,6 +189,7 @@
         const scroll = document.getElementById('scroll');
         const hint = document.getElementById('loading-hint');
         const mainBtn = document.getElementById('main-action-btn');
+        const shareBtn = document.getElementById('share-btn-text');
         const fHint = document.getElementById('footer-hint-text');
 
         initBtn.classList.add('hidden');
@@ -192,20 +204,23 @@
         cat.classList.add('fade');
         hint.style.opacity = "0";
 
-        // 判斷是否為超大吉
         const isSuperLucky = (pick.type === "超大吉");
 
         document.getElementById('res-type').innerText = pick.type;
         document.getElementById('res-intro').innerText = pick.intro;
         
-        // 顯示按鈕群組
-        if (pick.star < 3) afterGroup.classList.add('single-btn');
-        else afterGroup.classList.remove('single-btn');
+        // 修改判斷邏輯：若小於 3 顆星，進入 single-btn 模式
+        if (pick.star < 3) {
+            afterGroup.classList.add('single-btn');
+            shareBtn.classList.add('hidden');
+        } else {
+            afterGroup.classList.remove('single-btn');
+            shareBtn.classList.remove('hidden');
+        }
 
         scroll.classList.add('active');
         await new Promise(r => setTimeout(r, 600)); 
 
-        // 星星動畫
         const sCont = document.getElementById('res-stars');
         for (let i = 0; i < pick.star; i++) {
             const span = document.createElement('span'); span.innerText = "★";
@@ -214,11 +229,9 @@
             await new Promise(r => setTimeout(r, 300)); 
         }
 
-        // 中獎特殊邏輯
         if (isSuperLucky) {
             currentSerial = generateSerial();
             document.getElementById('win-serial').innerText = "序號: " + currentSerial;
-            
             mainBtn.innerText = "複製訊息領獎 📋";
             mainBtn.classList.add('btn-win-claim');
             mainBtn.onclick = function() { handleClaimProcess(this); };
@@ -232,7 +245,6 @@
             }, 100);
         }
 
-        // 內容淡入
         document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
         const dCont = document.getElementById('res-details');
         for (let item of pick.items) {
@@ -243,6 +255,13 @@
         }
 
         afterGroup.classList.add('show');
+    }
+
+    function generateSerial() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let result = '';
+        for (let i = 0; i < 9; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+        return result;
     }
 
     function shareToLine() {
