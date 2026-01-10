@@ -71,6 +71,8 @@
 </head>
 <body>
 <div class="game-wrapper">
+    <input type="text" id="copy-helper" style="position: absolute; left: -9999px; top: 0;" readonly>
+
     <div class="header-section">
         <div class="title-group">
             <h1 id="main-title" class="title">吉運臨門</h1>
@@ -101,12 +103,11 @@
 </div>
 
 <script>
+    // 籤詩資料，強制讓第一個是五星大吉方便測試 (正式可換回原樣)
     const fortuneData = [
         { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
-        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "💼 根基紮實，贏得團隊信任。"] },
         { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "💼 勢如破竹，進展極其順利。"] },
-        { id: 9, star: 4, type: "大吉", intro: "正迎來一段收穫的高峰期。", items: ["❤️ 圓滿時刻，適合談論終身大事。", "💰 財運亨通，有點石成金手感。", "☘️ 驚喜連連，充滿開心的好消息。", "💼 功成名就，地位已確立。"] }
-        // ... 其他資料可自行保留或增加
+        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "💼 根基紮實，贏得團隊信任。"] }
     ];
 
     let lastResult = "";
@@ -123,21 +124,42 @@
         return result;
     }
 
-    // 核心邏輯：自定義複製訊息
+    // 強化版複製函式 (解決手機瀏覽器只複製序號的問題)
     function handleClaimReward(btnElement) {
+        // 設定要複製的完整字串
+        const fullMessage = "您好！我抽中了五星超大吉！領取序號是：(" + currentSerial + ")";
+        
         if (!isCopied) {
-            // 設定您想要複製的完整文字內容
-            const fullMessage = `您好！我抽中了五星超大吉！領取序號是：(${currentSerial})`;
-            
-            navigator.clipboard.writeText(fullMessage).then(() => {
+            // 嘗試使用現代 Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullMessage).then(copySuccess).catch(copyFallback);
+            } else {
+                copyFallback();
+            }
+
+            function copySuccess() {
                 isCopied = true;
                 btnElement.innerText = "前往 LINE 領取 🎁";
                 btnElement.classList.add('btn-copied');
                 document.getElementById('footer-hint-text').innerText = "✅ 訊息已複製，請至 LINE 貼上發送";
-            }).catch(err => {
-                alert("複製失敗，請手動複製序號：" + currentSerial);
-            });
+                document.getElementById('footer-hint-text').style.color = "#4caf50";
+            }
+
+            function copyFallback() {
+                // 備援方案：建立隱藏輸入框手動選取
+                const helper = document.getElementById('copy-helper');
+                helper.value = fullMessage;
+                helper.select();
+                helper.setSelectionRange(0, 99999); // 手機專用選取範圍
+                try {
+                    document.execCommand('copy');
+                    copySuccess();
+                } catch (err) {
+                    alert("手機不支援自動複製，請截圖序號：" + currentSerial);
+                }
+            }
         } else {
+            // 已複製後再次點擊，跳轉 LINE
             window.location.href = LINE_OA_URL;
         }
     }
@@ -163,6 +185,7 @@
         
         const mainBtn = document.getElementById('main-action-btn');
         mainBtn.innerText = "再抽一次";
+        mainBtn.style.color = "";
         mainBtn.classList.remove('btn-win-claim', 'btn-copied');
         mainBtn.onclick = resetUIAndRedraw;
         afterGroup.classList.remove('single-btn');
@@ -183,12 +206,13 @@
         hint.style.opacity = "1"; hint.classList.add('pulse-text');
         cat.classList.add('shaking');
         fHint.style.opacity = "0";
+        fHint.style.color = "#ffffff";
 
-        // 隨機抽選
+        // 隨機選取
         const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
         lastResult = pick.type;
 
-        await new Promise(r => setTimeout(r, 2500));
+        await new Promise(r => setTimeout(r, 2000));
         
         cat.classList.remove('shaking');
         cat.classList.add('fade');
@@ -197,7 +221,6 @@
         document.getElementById('res-type').innerText = pick.type;
         document.getElementById('res-intro').innerText = pick.intro;
 
-        // 判斷按鈕佈局
         const high = ["超大吉", "大吉"];
         if (!high.includes(pick.type)) { 
             afterGroup.classList.add('single-btn'); 
@@ -216,13 +239,14 @@
             await new Promise(r => setTimeout(r, 300)); 
         }
 
-        // 中獎特殊處理
+        // 針對「超大吉」進行按鈕邏輯綁定
         if (pick.type === "超大吉") {
             currentSerial = generateSerial();
             document.getElementById('win-serial').innerText = "序號: " + currentSerial;
             
             mainBtn.innerText = "複製訊息領獎 📋";
             mainBtn.classList.add('btn-win-claim');
+            // 重要：重新綁定點擊事件
             mainBtn.onclick = function() { handleClaimReward(this); };
             
             setTimeout(() => {
