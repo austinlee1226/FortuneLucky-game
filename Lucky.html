@@ -22,10 +22,17 @@
         .content-section { position: relative; width: 100%; height: 65dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
         .footer-section { width: 100%; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 1000; }
 
-        .title-group { display: grid; place-items: center; width: 100%; height: 60px; position: relative; }
+        .title-group { display: grid; place-items: center; width: 100%; height: 80px; position: relative; }
         .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; margin: 0; z-index: 10; transition: opacity 0.4s ease; }
-        .win-banner { grid-area: 1 / 1; transform: scale(0); background: linear-gradient(90deg, transparent, #ff5722, #ff9800, #ff5722, transparent); color: var(--win-color); width: 100%; padding: 10px 0; font-size: 1.6rem; font-weight: 900; text-align: center; z-index: 20; opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .win-banner.show { transform: scale(1); opacity: 1; animation: winPulse 0.8s infinite alternate; }
+        
+        /* 中獎橫幅與序號樣式 */
+        .win-info-wrapper { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; transform: scale(0); opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 20; }
+        .win-info-wrapper.show { transform: scale(1); opacity: 1; }
+        
+        .win-banner { background: linear-gradient(90deg, transparent, #ff5252, #ff5252, transparent); color: var(--win-color); width: 100%; padding: 5px 0; font-size: 1.6rem; font-weight: 900; text-align: center; animation: winPulse 0.8s infinite alternate; }
+        
+        .win-serial { color: #ffffff; font-size: 1.1rem; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 2px 15px; border-radius: 20px; border: 1px solid var(--gold); letter-spacing: 2px; text-shadow: 0 0 8px var(--gold); }
+
         .reward-hint { color: white; font-size: 0.85rem; margin-top: 5px; opacity: 0.8; letter-spacing: 1px; transition: opacity 0.4s ease; }
 
         .cat-visual { width: 85px; transition: opacity 0.3s; margin-bottom: 5px; }
@@ -57,7 +64,6 @@
         .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; transition: transform 0.1s; text-align: center; text-decoration: none; }
         .btn-common:active { transform: translateY(2px); box-shadow: 0 2px 0 #795548; }
 
-        /* 超大吉專屬按鈕 */
         .btn-win-claim { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #ffffff; box-shadow: 0 4px 0 #5d4037; }
 
         .single-btn #share-btn-text { display: none !important; }
@@ -65,7 +71,7 @@
         .hidden { display: none !important; }
         .footer-hint { color: white; font-size: 0.85rem; margin-top: 10px; opacity: 1; transition: opacity 0.4s; }
 
-        @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+        @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
         @keyframes textFade { from { opacity: 0.3; } to { opacity: 1; } }
         .shaking { animation: shakeEffect 0.15s infinite; }
         @keyframes shakeEffect { 0%, 100% { transform: rotate(0deg) translateY(0); } 25% { transform: rotate(7deg) translateY(-4px); } 75% { transform: rotate(-7deg) translateY(-4px); } }
@@ -74,7 +80,13 @@
 <body>
 <div class="game-wrapper">
     <div class="header-section">
-        <div class="title-group"><h1 id="main-title" class="title">吉運臨門</h1><div id="win-banner" class="win-banner">恭喜中獎</div></div>
+        <div class="title-group">
+            <h1 id="main-title" class="title">吉運臨門</h1>
+            <div id="win-info" class="win-info-wrapper">
+                <div id="win-banner" class="win-banner">恭喜中獎</div>
+                <div id="win-serial" class="win-serial">序號: 000000000</div>
+            </div>
+        </div>
         <p id="reward-text" class="reward-hint">抽中五星即可獲得獎勵禮卷</p>
     </div>
     <div class="content-section">
@@ -102,7 +114,7 @@
         { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
         { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間，靜待時機成熟。", items: ["❤️ 緣分急不來，打理好自己最重要。", "💰 適合保守理財，固守資金流。", "☘️ 運氣正在排隊，請平常心等待。", "✈️ 不宜遠行，適合在家深度休息。", "💼 蓄勢待發，沈默是為了爆發。"] },
         { id: 4, star: 2, type: "小吉", intro: "正站在變革的交叉路口。建議放下舊有的思維，用開放心態迎接。", items: ["❤️ 換個交友圈，會遇到驚艷奇緣。", "💰 出現轉機，有機會轉虧為盈。", "☘️ 逢凶化吉，關鍵時刻總能過關。", "✈️ 隨興的旅程會帶給你驚喜。", "💼 轉換視角，難關立刻變成機會。"] },
-        { id: 5, star: 3, type: "中吉", intro: "適合團隊合作而非單打獨鬥。主動伸出友誼之手，透過分享達成目標。", items: ["❤️ 真誠的告白與承諾，在此刻最動人。", "💰 透過異業合作能分到大利潤。", "☘️ 貴人多在社交場合，請多露面。", "✈️ 與合適夥伴同遊，樂趣會翻倍。", "💼 資源整合能力是職場所向靡武器。"] },
+        { id: 5, star: 3, type: "中吉", intro: "適合團隊合作而非單打獨鬥. 主動伸出友誼之手，透過分享達成目標。", items: ["❤️ 真誠的告白與承諾，在此刻最動人。", "💰 透過異業合作能分到大利潤。", "☘️ 貴人多在社交場合，請多露面。", "✈️ 與合適夥伴同遊，樂趣會翻倍。", "💼 資源整合能力是職場所向靡武器。"] },
         { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利。"] },
         { id: 7, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 支出請保持謹慎，避免衝動購物。", "☘️ 靈光閃現瞬間，就是轉運開始。", "✈️ 出行注意安全，並預留備案。", "💼 專注處理核心業務。"] },
         { id: 8, star: 2, type: "小吉", intro: "正處於打地基的關鍵期。建議維持現有的韌性，小步快跑地穩定成長。", items: ["❤️ 慢火熬煮的感情，比速食更持久。", "💰 聚沙成塔，每一分都是金礦。", "☘️ 你的勤奮將換來一份特別好運。", "✈️ 適合勞動型旅行，強健體魄。", "💼 步步為營，專業度讓對手敬佩。"] },
@@ -112,6 +124,16 @@
 
     let lastResult = "";
     const LINE_OA_URL = "https://lin.ee/4lqVqd3"; 
+
+    // 新增：產生 9 位數亂數序號 (英數混合)
+    function generateSerial() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 排除容易混淆的 0, 1, O, I
+        let result = '';
+        for (let i = 0; i < 9; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
 
     function shareToLine() {
         const shareText = `🧧 2026 運勢揭曉！我剛抽到了「${lastResult}」籤！\n你也快來抽一張你的開運籤詩吧！\n👉 ${window.location.href.split('?')[0]}`;
@@ -123,7 +145,7 @@
         const afterGroup = document.getElementById('after-draw-group');
         afterGroup.classList.remove('show');
         document.getElementById('scroll').classList.remove('active');
-        document.getElementById('win-banner').classList.remove('show');
+        document.getElementById('win-info').classList.remove('show');
         document.getElementById('main-title').style.opacity = "1";
         document.getElementById('reward-text').style.opacity = "0.8";
         document.getElementById('cat-actor').classList.remove('fade');
@@ -185,18 +207,20 @@
             await new Promise(r => setTimeout(r, 400)); 
         }
 
-        // 🌟 星星跑完後，若是「超大吉」才觸發恭喜效果
+        // 🌟 星星跑完後，若是「超大吉」才觸發恭喜效果與產生序號
         if (pick.type === "超大吉") {
+            const serialNum = generateSerial();
+            document.getElementById('win-serial').innerText = "序號: " + serialNum;
+            
             mainBtn.innerText = "點我領取獎勵 🎁";
             mainBtn.classList.add('btn-win-claim');
             mainBtn.onclick = () => { window.location.href = LINE_OA_URL; };
             
-            // 延遲一點點讓視覺更自然
             setTimeout(() => {
                 document.getElementById('main-title').style.opacity = "0"; 
                 document.getElementById('reward-text').style.opacity = "0"; 
-                document.getElementById('win-banner').classList.add('show');
-                fHint.innerText = "請截圖至官方LINE領取獎勵"; 
+                document.getElementById('win-info').classList.add('show');
+                fHint.innerText = "請截圖此序號至官方LINE領取獎勵"; 
                 fHint.style.opacity = "1";
             }, 100);
         }
