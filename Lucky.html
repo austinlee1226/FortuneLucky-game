@@ -3,30 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <title>吉運臨門 - 2026 你的開運籤詩</title>
+    
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://austinlee1226.github.io/FortuneLucky-game/Lucky.html">
     <meta property="og:title" content="🧧 吉運臨門 - 2026 你的開運籤詩">
-    <meta property="og:description" content="2026 運勢如何？快來測測你的今日開運籤詩，超準分享還能重複抽！">
-    <meta property="og:image" content=""> 
+    <meta property="og:description" content="2026 運勢如何？快來抽一張你的今日開運籤詩！">
 
     <style>
         :root { --bg-red: #b71c1c; --gold: #ffd700; --paper: #fffdf5; --win-color: #ffeb3b; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #1a1a1a; margin: 0; display: flex; justify-content: center; align-items: center; height: 100dvh; font-family: -apple-system, "Microsoft JhengHei", sans-serif; overflow: hidden; }
         .game-wrapper { position: relative; background-color: var(--bg-red); width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        
         .header-section { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 2dvh; z-index: 10; }
         .title-group { display: grid; place-items: center; width: 100%; height: 60px; position: relative; }
         .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; transition: opacity 0.3s; margin: 0; z-index: 10; }
         .win-banner { grid-area: 1 / 1; transform: scale(0); background: linear-gradient(90deg, transparent, #ff5722, #ff9800, #ff5722, transparent); color: var(--win-color); width: 100%; padding: 10px 0; font-size: 1.6rem; font-weight: 900; text-align: center; z-index: 20; opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .win-banner.show { transform: scale(1); opacity: 1; animation: winPulse 0.8s infinite alternate; }
         .reward-hint { color: white; font-size: 0.85rem; margin-top: 5px; opacity: 0.8; letter-spacing: 1px; transition: opacity 0.3s; }
+
         .content-section { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         .cat-visual { width: 85px; transition: opacity 0.3s; margin-bottom: 5px; }
         .cat-visual.fade { opacity: 0.05; }
         .loading-hint { color: white; font-size: 14px; letter-spacing: 2px; opacity: 0; height: 20px; }
         .pulse-text { animation: textFade 1s infinite alternate; }
+
         .scroll-container { position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 92%; height: 70dvh; background: var(--paper); border: 5px solid #5d4037; border-radius: 12px; padding: 20px 18px; box-shadow: 0 15px 45px rgba(0,0,0,0.7); opacity: 0; z-index: 100; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; }
         .scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         .fade-in { opacity: 0; transition: opacity 0.4s ease; }
@@ -40,11 +42,34 @@
         .details-list { text-align: left; padding: 0; list-style: none; margin: 0; flex-grow: 1; }
         .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
         .details-list li.reveal { opacity: 1; transform: translateY(0); }
-        .footer-section { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; z-index: 1000; position: relative; }
-        .action-btn { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 14px 45px; font-size: 1.3rem; font-weight: 900; border-radius: 50px; box-shadow: 0 5px 0 #795548; cursor: pointer; transition: opacity 0.4s ease, transform 0.1s active; }
-        .action-btn.hidden { opacity: 0; pointer-events: none; }
-        .action-btn:active { transform: translateY(2px); box-shadow: 0 3px 0 #795548; }
-        .footer-hint { color: white; font-size: 0.85rem; margin-top: 15px; letter-spacing: 1px; transition: opacity 0.4s ease; min-height: 1.2rem; text-align: center; }
+
+        .footer-section { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 40px; z-index: 1000; position: relative; }
+        
+        .draw-btn-large { 
+            background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; 
+            border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; 
+            border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer;
+        }
+
+        .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); transition: all 0.5s ease; pointer-events: none; }
+        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .btn-secondary { 
+            flex: 1; background: #9e9e9e; color: white; border: none; padding: 12px 0; 
+            font-size: 1.1rem; font-weight: bold; border-radius: 30px; box-shadow: 0 4px 0 #616161; cursor: pointer;
+        }
+        .btn-primary { 
+            flex: 1.5; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; 
+            border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; 
+            border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer;
+        }
+
+        /* 單一按鈕時分享按鈕隱藏 */
+        .single-btn #share-btn-text { display: none; }
+        .single-btn .btn-secondary { flex: 0 1 200px; }
+
+        .hidden { display: none !important; }
+        .footer-hint { color: white; font-size: 0.85rem; margin-top: 15px; letter-spacing: 1px; transition: opacity 0.4s ease; text-align: center; }
         @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.05); } }
         @keyframes textFade { from { opacity: 0.3; } to { opacity: 1; } }
         .shaking { animation: shakeEffect 0.15s infinite; }
@@ -77,7 +102,13 @@
     </div>
 
     <div class="footer-section">
-        <button id="draw-btn" class="action-btn" onclick="handleButtonClick()">立即抽好運</button>
+        <button id="init-draw-btn" class="draw-btn-large" onclick="startDrawing()">立即抽好運</button>
+        
+        <div id="after-draw-group" class="button-group">
+            <button class="btn-secondary" onclick="resetUI()">再抽一次</button>
+            <button id="share-btn-text" class="btn-primary" onclick="shareToLine()">分享好運</button>
+        </div>
+
         <p id="footer-hint-text" class="footer-hint">今日運勢好不好，一抽就知道</p>
     </div>
 </div>
@@ -96,65 +127,45 @@
         { id: 10, star: 1, type: "吉", intro: "適合檢視過往、修正偏差的時機。建議稍微放慢節奏，把能量聚焦。", items: ["❤️ 檢視彼此關係，調整互動頻率。", "💰 重新配置理財，找出潛在風險。", "☘️ 避開鋒芒紛爭，就是最好轉運。", "✈️ 適合短途小憩，讓身心快速充電。", "💼 優化架構，將繁瑣流程重置。"] }
     ];
 
-    let state = "READY";
-    let lastResult = ""; // 紀錄上一次抽到的結果
+    let lastResult = "";
 
-    function handleButtonClick() {
-        if (state === "FINISHED") {
-            shareToLine();
-        } else if (state === "READY") {
-            startDrawing();
-        }
-    }
-
-    // LINE 分享核心邏輯
     function shareToLine() {
-        // 準備分享文字
-        const shareText = `🧧 欸！我剛抽到了「${lastResult}」籤！\n這是我 2026 的開運預測，感覺很準耶，你也來測測看！\n👉 ${window.location.href}`;
-        
-        // 建立 LINE 分享連結
+        const shareText = `🧧 2026 運勢揭曉！我剛抽到了「${lastResult}」籤！\n你也快來抽一張你的開運籤詩吧！\n👉 ${window.location.href.split('?')[0]}`;
         const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
-        
-        // 背景偷偷重置 UI，讓玩家回頭就能重抽
-        resetUI();
-        
-        // 跳轉到 LINE
         window.location.href = lineUrl;
     }
 
     function resetUI() {
-        state = "READY";
         document.getElementById('scroll').classList.remove('active');
         document.getElementById('win-banner').classList.remove('show');
+        document.getElementById('after-draw-group').classList.remove('show');
+        document.getElementById('after-draw-group').classList.remove('single-btn');
         document.getElementById('main-title').style.opacity = "1";
         document.getElementById('reward-text').style.opacity = "0.8";
         document.getElementById('cat-actor').classList.remove('fade');
         document.getElementById('res-stars').innerHTML = "";
         document.querySelectorAll('.fade-in').forEach(el => el.classList.remove('visible'));
         document.getElementById('res-details').innerHTML = "";
-        const fHint = document.getElementById('footer-hint-text');
-        fHint.innerText = "今日運勢好不好，一抽就知道";
-        fHint.style.opacity = "1";
-        const btn = document.getElementById('draw-btn');
-        btn.innerText = "立即抽好運";
-        btn.classList.remove('hidden');
+        document.getElementById('init-draw-btn').classList.remove('hidden');
+        document.getElementById('footer-hint-text').innerText = "今日運勢好不好，一抽就知道";
+        document.getElementById('footer-hint-text').style.opacity = "1";
     }
 
     async function startDrawing() {
-        const btn = document.getElementById('draw-btn');
+        const initBtn = document.getElementById('init-draw-btn');
+        const afterGroup = document.getElementById('after-draw-group');
         const cat = document.getElementById('cat-actor');
         const scroll = document.getElementById('scroll');
         const hint = document.getElementById('loading-hint');
         const footerHint = document.getElementById('footer-hint-text');
 
-        state = "DRAWING";
-        btn.classList.add('hidden');
+        initBtn.classList.add('hidden');
         hint.style.opacity = "1"; hint.classList.add('pulse-text');
         cat.classList.add('shaking');
         footerHint.style.opacity = "0";
 
         const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
-        lastResult = pick.type; // 存入全域變數供分享使用
+        lastResult = pick.type;
 
         await new Promise(r => setTimeout(r, 3000));
         
@@ -164,6 +175,12 @@
 
         document.getElementById('res-type').innerText = pick.type;
         document.getElementById('res-intro').innerText = pick.intro;
+
+        // 判斷是否顯示分享按鈕
+        const highFortune = ["超大吉", "大吉", "中吉"];
+        if (!highFortune.includes(pick.type)) {
+            afterGroup.classList.add('single-btn');
+        }
 
         scroll.classList.add('active');
         await new Promise(r => setTimeout(r, 600)); 
@@ -193,13 +210,11 @@
             document.getElementById('main-title').style.opacity = "0"; 
             document.getElementById('reward-text').style.opacity = "0"; 
             document.getElementById('win-banner').classList.add('show');
-            footerHint.innerText = "請截圖至粉絲團貼圖留言換取獎勵";
+            footerHint.innerText = "請截圖至粉絲團換取獎勵";
             footerHint.style.opacity = "1";
         }
 
-        state = "FINISHED";
-        btn.innerText = "LINE分享重抽";
-        btn.classList.remove('hidden');
+        afterGroup.classList.add('show');
     }
 </script>
 </body>
