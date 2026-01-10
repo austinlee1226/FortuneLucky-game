@@ -150,7 +150,6 @@
 </div>
 
 <script>
-    // 匯入前10首資料並清理字樣
     const fortuneData = [
         { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
         { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
@@ -174,8 +173,10 @@
         }
     }
 
-    // 分享並重置邏輯
+    // 更新：相容 Line/FB 的分享重置邏輯
     async function shareAndReset() {
+        const fbShareUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(window.location.href);
+
         if (navigator.share) {
             try {
                 await navigator.share({
@@ -186,12 +187,13 @@
                 resetUI();
                 setTimeout(startDrawing, 350);
             } catch (err) {
-                // 取消分享依然可以重抽
+                // 如果是使用者取消分享，依然允許重抽
                 resetUI();
                 setTimeout(startDrawing, 350);
             }
         } else {
-            // 不支援分享時直接重抽
+            // 在 Line 內或電腦不支援 share 時，直接開啟 FB 分享視窗
+            window.open(fbShareUrl, '_blank');
             resetUI();
             setTimeout(startDrawing, 350);
         }
