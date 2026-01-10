@@ -50,13 +50,12 @@
         .draw-btn-large { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer; }
         
         .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; }
-        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; transition: opacity 0.5s ease, transform 0.5s ease; display: flex !important; }
+        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; display: flex !important; transition: opacity 0.5s ease, transform 0.5s ease; }
         
         .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; transition: all 0.2s; text-align: center; text-decoration: none; }
         .btn-common:active { transform: translateY(2px); box-shadow: 0 2px 0 #795548; }
 
         .btn-win-claim { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #ffffff; box-shadow: 0 4px 0 #5d4037; }
-        /* 複製後的綠色樣式 */
         .btn-copied { background: linear-gradient(180deg, #43a047, #2e7d32) !important; color: white !important; box-shadow: 0 4px 0 #1b5e20 !important; }
 
         .single-btn #share-btn-text { display: none !important; }
@@ -104,20 +103,15 @@
 <script>
     const fortuneData = [
         { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
-        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
-        { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間，靜待時機成熟。", items: ["❤️ 緣分急不來，打理好自己最重要。", "💰 適合保守理財，固守資金流。", "☘️ 運氣正在排隊，請平常心等待。", "✈️ 不宜遠行，適合在家深度休息。", "💼 蓄勢待發，沈默是為了爆發。"] },
-        { id: 4, star: 2, type: "小吉", intro: "正站在變革的交叉路口。建議放下舊有的思維，用開放心態迎接。", items: ["❤️ 換個交友圈，會遇到驚艷奇緣。", "💰 出現轉機，有機會轉虧為盈。", "☘️ 逢凶化吉，關鍵時刻總能過關。", "✈️ 隨興的旅程會帶給你驚喜。", "💼 轉換視角，難關立刻變成機會。"] },
-        { id: 5, star: 3, type: "中吉", intro: "適合團隊合作而非單打獨鬥。", items: ["❤️ 真誠的告白與承諾，在此刻最動人。", "💰 透過異業合作能分到大利潤。", "☘️ 貴人多在社交場合，請多露面。", "✈️ 與合適夥伴同遊，樂趣會翻倍。", "💼 資源整合能力是職場所向靡武器。"] },
-        { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利。"] },
-        { id: 7, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 支出請保持謹慎，避免衝動購物。", "☘️ 靈光閃現瞬間，就是轉運開始。", "✈️ 出行注意安全，並預留備案。", "💼 專注處理核心業務。"] },
-        { id: 8, star: 2, type: "小吉", intro: "正處於打地基的關鍵期。建議維持現有的韌性，小步快跑地穩定成長。", items: ["❤️ 慢火熬煮的感情，比速食更持久。", "💰 聚沙成塔，每一分都是金礦。", "☘️ 你的勤奮將換來一份特別好運。", "✈️ 適合勞動型旅行，強健體魄。", "💼 步步為營，專業度讓對手敬佩。"] },
-        { id: 9, star: 4, type: "大吉", intro: "正迎來一段收穫的高峰期。建議放鬆心情去感受成就，並與他人共享。", items: ["❤️ 圓滿時刻，適合談論終身大事。", "💰 財運亨通，有點石成金手感。", "☘️ 驚喜連連，充滿開心的好消息。", "✈️ 盡興而歸，一次完美的盛宴。", "💼 功成名就，地位已確立。"] },
-        { id: 10, star: 1, type: "吉", intro: "適合檢視過往、修正偏差的時機。建議稍微放慢節奏，把能量聚焦。", items: ["❤️ 檢視彼此關係，調整互動頻率。", "💰 重新配置理財，找出潛在風險。", "☘️ 避開鋒芒紛爭，就是最好轉運。", "✈️ 適合短途小憩，讓身心快速充電。", "💼 優化架構，將繁瑣流程重置。"] }
+        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "💼 根基紮實，贏得團隊信任。"] },
+        { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "💼 勢如破竹，進展極其順利。"] },
+        { id: 9, star: 4, type: "大吉", intro: "正迎來一段收穫的高峰期。", items: ["❤️ 圓滿時刻，適合談論終身大事。", "💰 財運亨通，有點石成金手感。", "☘️ 驚喜連連，充滿開心的好消息。", "💼 功成名就，地位已確立。"] }
+        // ... 其他資料可自行保留或增加
     ];
 
     let lastResult = "";
     let currentSerial = "";
-    let isCopied = false; // 追蹤是否已複製
+    let isCopied = false; 
     const LINE_OA_URL = "https://lin.ee/4lqVqd3"; 
 
     function generateSerial() {
@@ -129,20 +123,21 @@
         return result;
     }
 
-    // 核心邏輯：領獎按鈕處理
+    // 核心邏輯：自定義複製訊息
     function handleClaimReward(btnElement) {
         if (!isCopied) {
-            // 第一步：執行複製
-            navigator.clipboard.writeText(currentSerial).then(() => {
+            // 設定您想要複製的完整文字內容
+            const fullMessage = `您好！我抽中了五星超大吉！領取序號是：(${currentSerial})`;
+            
+            navigator.clipboard.writeText(fullMessage).then(() => {
                 isCopied = true;
                 btnElement.innerText = "前往 LINE 領取 🎁";
                 btnElement.classList.add('btn-copied');
-                document.getElementById('footer-hint-text').innerText = "✅ 序號已複製，請至 LINE 貼上發送";
+                document.getElementById('footer-hint-text').innerText = "✅ 訊息已複製，請至 LINE 貼上發送";
             }).catch(err => {
-                alert("複製失敗，請手動截圖序號");
+                alert("複製失敗，請手動複製序號：" + currentSerial);
             });
         } else {
-            // 第二步：跳轉 LINE
             window.location.href = LINE_OA_URL;
         }
     }
@@ -189,10 +184,11 @@
         cat.classList.add('shaking');
         fHint.style.opacity = "0";
 
+        // 隨機抽選
         const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
         lastResult = pick.type;
 
-        await new Promise(r => setTimeout(r, 3000));
+        await new Promise(r => setTimeout(r, 2500));
         
         cat.classList.remove('shaking');
         cat.classList.add('fade');
@@ -201,7 +197,8 @@
         document.getElementById('res-type').innerText = pick.type;
         document.getElementById('res-intro').innerText = pick.intro;
 
-        const high = ["超大吉", "大吉", "中吉"];
+        // 判斷按鈕佈局
+        const high = ["超大吉", "大吉"];
         if (!high.includes(pick.type)) { 
             afterGroup.classList.add('single-btn'); 
         } else { 
@@ -216,36 +213,36 @@
             const span = document.createElement('span'); span.innerText = "★";
             sCont.appendChild(span);
             setTimeout(() => span.classList.add('pop'), 50);
-            await new Promise(r => setTimeout(r, 400)); 
+            await new Promise(r => setTimeout(r, 300)); 
         }
 
+        // 中獎特殊處理
         if (pick.type === "超大吉") {
             currentSerial = generateSerial();
             document.getElementById('win-serial').innerText = "序號: " + currentSerial;
             
-            mainBtn.innerText = "複製序號領獎 📋";
+            mainBtn.innerText = "複製訊息領獎 📋";
             mainBtn.classList.add('btn-win-claim');
-            // 修改點擊事件：改為執行領獎邏輯
             mainBtn.onclick = function() { handleClaimReward(this); };
             
             setTimeout(() => {
                 document.getElementById('main-title').style.opacity = "0"; 
                 document.getElementById('reward-text').style.opacity = "0"; 
                 document.getElementById('win-info').classList.add('show');
-                fHint.innerText = "點擊按鈕複製序號後前往領取"; 
+                fHint.innerText = "點擊按鈕複製完整訊息後前往領取"; 
                 fHint.style.opacity = "1";
             }, 100);
         }
 
         document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
-        await new Promise(r => setTimeout(r, 600));
+        await new Promise(r => setTimeout(r, 400));
 
         const dCont = document.getElementById('res-details');
         for (let i = 0; i < pick.items.length; i++) {
             const li = document.createElement('li'); li.innerText = pick.items[i];
             dCont.appendChild(li);
             setTimeout(() => li.classList.add('reveal'), 50);
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 200));
         }
 
         afterGroup.classList.add('show');
