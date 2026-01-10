@@ -4,71 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>吉運臨門 - 2026 你的開運籤詩</title>
+    
     <style>
-        :root { --bg-red: #b71c1c; --gold: #ffd700; --paper: #fffdf5; }
+        :root { --bg-red: #b71c1c; --gold: #ffd700; --paper: #fffdf5; --btn-win: linear-gradient(180deg, #ff5252, #b71c1c); --btn-green: linear-gradient(180deg, #43a047, #2e7d32); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #1a1a1a; margin: 0; display: flex; justify-content: center; align-items: center; height: 100dvh; font-family: -apple-system, "Microsoft JhengHei", sans-serif; overflow: hidden; }
-        .game-wrapper { position: relative; background-color: var(--bg-red); width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        
+        .game-wrapper { position: relative; background-color: #b71c1c; width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        
         .header-section { width: 100%; height: 15dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
         .content-section { position: relative; width: 100%; height: 65dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
         .footer-section { width: 100%; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 1000; }
+
         .title-group { display: grid; place-items: center; width: 100%; height: 80px; position: relative; }
-        .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; margin: 0; z-index: 10; }
-        .win-info-wrapper { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; transform: scale(0); opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; margin: 0; z-index: 10; transition: opacity 0.4s ease; }
+        
+        .win-info-wrapper { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; transform: scale(0); opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 20; }
         .win-info-wrapper.show { transform: scale(1); opacity: 1; }
-        .win-banner { background: linear-gradient(90deg, transparent, #ff5252, #ff5252, transparent); color: #ffeb3b; width: 100%; padding: 5px 0; font-size: 1.6rem; font-weight: 900; text-align: center; }
-        .win-serial { color: #ffffff; font-size: 1.1rem; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 2px 15px; border-radius: 20px; border: 1px solid var(--gold); letter-spacing: 2px; }
-        .scroll-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 92%; height: 95%; background: var(--paper); border: 5px solid #5d4037; border-radius: 12px; padding: 20px 18px; opacity: 0; z-index: 100; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; }
+        
+        .win-banner { background: linear-gradient(90deg, transparent, #ff5252, #ff5252, transparent); color: #ffeb3b; width: 100%; padding: 5px 0; font-size: 1.6rem; font-weight: 900; text-align: center; animation: winPulse 0.8s infinite alternate; }
+        .win-serial { color: #ffffff; font-size: 1.1rem; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 2px 15px; border-radius: 20px; border: 1px solid var(--gold); letter-spacing: 2px; text-shadow: 0 0 8px var(--gold); }
+
+        .reward-hint { color: white; font-size: 0.85rem; margin-top: 5px; opacity: 0.8; letter-spacing: 1px; transition: opacity 0.4s ease; }
+        .cat-visual { width: 85px; transition: opacity 0.3s; margin-bottom: 5px; }
+        .cat-visual.fade { opacity: 0.05; }
+        .loading-hint { color: white; font-size: 14px; letter-spacing: 2px; opacity: 0; height: 20px; }
+        .pulse-text { animation: textFade 1s infinite alternate; }
+
+        .scroll-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 92%; height: 95%; background: #fffdf5; border: 5px solid #5d4037; border-radius: 12px; padding: 20px 18px; box-shadow: 0 15px 45px rgba(0,0,0,0.7); opacity: 0; z-index: 100; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; display: flex; flex-direction: column; }
         .scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        .draw-btn-large { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer; }
-        .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; }
-        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; text-align: center; text-decoration: none; }
-        .btn-win-claim { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #ffffff; }
-        .btn-copied { background: linear-gradient(180deg, #43a047, #2e7d32) !important; color: white !important; }
-        .hidden { display: none !important; }
-        .footer-hint { color: white; font-size: 0.85rem; margin-top: 10px; }
-        .details-list { text-align: left; padding: 0; list-style: none; margin: 0; overflow-y: auto; }
-        .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: 0.3s; }
-        .details-list li.reveal { opacity: 1; transform: translateY(0); }
+        .fade-in { opacity: 0; transition: opacity 0.4s ease; }
+        .fade-in.visible { opacity: 1; }
+        
+        .res-header-group { display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #b71c1c; padding-bottom: 4px; margin-bottom: 10px; }
         .star-rating { color: var(--gold); font-size: 1.15rem; letter-spacing: 4px; }
-        .star-rating span { display: inline-block; transform: scale(0); transition: 0.3s; }
+        .star-rating span { display: inline-block; transform: scale(0); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .star-rating span.pop { transform: scale(1); }
+        .fortune-header { color: #b71c1c; font-size: 2rem; margin: 0; }
+        .fortune-intro { font-size: 0.9rem; color: #333; line-height: 1.4; margin: 15px 0; font-weight: bold; }
+        .details-list { text-align: left; padding: 0; list-style: none; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
+        .details-list li.reveal { opacity: 1; transform: translateY(0); }
+
+        .draw-btn-large { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer; }
+        
+        .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; }
+        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; display: flex !important; transition: all 0.5s ease; }
+        
+        .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-common:active { transform: translateY(2px); box-shadow: 0 2px 0 #795548; }
+
+        /* 領獎按鈕狀態 */
+        .btn-win-claim { background: var(--btn-win); color: #ffffff; box-shadow: 0 4px 0 #5d4037; }
+        .btn-green-status { background: var(--btn-green) !important; color: white !important; box-shadow: 0 4px 0 #1b5e20 !important; }
+
+        .single-btn #share-btn-text { display: none !important; }
+        .hidden { display: none !important; }
+        .footer-hint { color: white; font-size: 0.85rem; margin-top: 10px; opacity: 1; transition: opacity 0.4s; text-align: center; }
+
+        @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
+        @keyframes textFade { from { opacity: 0.3; } to { opacity: 1; } }
         .shaking { animation: shakeEffect 0.15s infinite; }
-        @keyframes shakeEffect { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(7deg); } 75% { transform: rotate(-7deg); } }
+        @keyframes shakeEffect { 0%, 100% { transform: rotate(0deg) translateY(0); } 25% { transform: rotate(7deg) translateY(-4px); } 75% { transform: rotate(-7deg) translateY(-4px); } }
     </style>
 </head>
 <body>
 <div class="game-wrapper">
-    <input type="text" id="copy-helper" style="position: absolute; left: -9999px;" readonly>
-
     <div class="header-section">
         <div class="title-group">
             <h1 id="main-title" class="title">吉運臨門</h1>
             <div id="win-info" class="win-info-wrapper">
                 <div class="win-banner">恭喜中獎</div>
-                <div id="win-serial" class="win-serial">序號: --------</div>
+                <div id="win-serial" class="win-serial">序號: 000000000</div>
             </div>
         </div>
+        <p id="reward-text" class="reward-hint">抽中五星即可獲得獎勵禮卷</p>
     </div>
-
     <div class="content-section">
-        <div id="cat-actor" style="font-size: 70px;">🐱</div>
+        <div id="cat-actor" class="cat-visual"><div style="font-size: 70px; text-align: center;">🐱</div></div>
+        <div id="loading-hint" class="loading-hint">誠心祈福中...</div>
         <div id="scroll" class="scroll-container">
-            <div style="text-align:center; border-bottom:2px solid #b71c1c; padding-bottom:5px;">
-                <div id="res-stars" class="star-rating"></div>
-                <h2 id="res-type" style="color:#b71c1c; margin:5px 0;"></h2>
-            </div>
-            <p id="res-intro" style="font-size:0.9rem; font-weight:bold; margin:10px 0;"></p>
+            <div class="res-header-group"><div id="res-stars" class="star-rating"></div><h2 id="res-type" class="fortune-header fade-in"></h2></div>
+            <p id="res-intro" class="fortune-intro fade-in"></p>
             <ul id="res-details" class="details-list"></ul>
         </div>
     </div>
-
     <div class="footer-section">
         <button id="init-draw-btn" class="draw-btn-large" onclick="startDrawing()">立即抽好運</button>
         <div id="after-draw-group" class="button-group">
-            <button id="main-action-btn" class="btn-common" onclick="resetUI()">再抽一次</button>
-            <button class="btn-common" onclick="shareToLine()">分享好運</button>
+            <button id="main-action-btn" class="btn-common" onclick="resetUIAndRedraw()">再抽一次</button>
+            <button id="share-btn-text" class="btn-common" onclick="shareToLine()">分享好運</button>
         </div>
         <p id="footer-hint-text" class="footer-hint">今日運勢好不好，一抽就知道</p>
     </div>
@@ -76,85 +101,154 @@
 
 <script>
     const fortuneData = [
-        { star: 5, type: "超大吉", intro: "能量爆發期！萬事亨通。", items: ["❤️ 正緣出現", "💰 財運亨通", "☘️ 貴人相助", "💼 步步高升"] }
+        { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
+        // ... (其他數據保持不變)
+        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
+        { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間，靜待時機成熟。", items: ["❤️ 緣分急不來，打理好自己最重要。", "💰 適合保守理財，固守資金流。", "☘️ 運氣正在排隊，請平常心等待。", "✈️ 不宜遠行，適合在家深度休息。", "💼 蓄勢待發，沈默是為了爆發。"] },
+        { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利。"] },
+        { id: 7, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 支出請保持謹慎，避免衝動購物。", "☘️ 靈光閃現瞬間，就是轉運開始。", "✈️ 出行注意安全，並預留備案。", "💼 專注處理核心業務。"] }
     ];
 
     let currentSerial = "";
-    let isCopied = false;
-    const LINE_OA_URL = "https://lin.ee/4lqVqd3";
+    let stepStatus = 1; // 1: 初始, 2: 已複製可跳轉
+    const LINE_OA_URL = "https://lin.ee/4lqVqd3"; 
 
-    function startDrawing() {
-        document.getElementById('init-draw-btn').classList.add('hidden');
-        document.getElementById('cat-actor').classList.add('shaking');
-        
-        setTimeout(() => {
-            document.getElementById('cat-actor').classList.remove('shaking');
-            document.getElementById('cat-actor').style.opacity = "0.1";
-            showResult(fortuneData[0]); // 強制展示超大吉測試
-        }, 1500);
+    function generateSerial() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let result = '';
+        for (let i = 0; i < 9; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+        return result;
     }
 
-    function showResult(pick) {
-        currentSerial = Math.random().toString(36).substr(2, 9).toUpperCase();
-        document.getElementById('win-serial').innerText = "序號: " + currentSerial;
+    // 核心邏輯：複製與按鈕轉換
+    async function handleClaimProcess(btn) {
+        if (stepStatus === 1) {
+            // 執行複製字串模板
+            const copyTemplate = `您好！我抽中了五星超大吉！領取序號是：(${currentSerial})`;
+            try {
+                await navigator.clipboard.writeText(copyTemplate);
+                
+                // 進入階段 2 & 3
+                stepStatus = 2;
+                btn.innerText = "前往 LINE 領取 🎁";
+                btn.classList.add('btn-green-status');
+                
+                const fHint = document.getElementById('footer-hint-text');
+                fHint.innerText = "✅ 訊息已複製，請至官方 LINE 發送";
+                fHint.style.color = "#81c784";
+                fHint.style.opacity = "1";
+            } catch (err) {
+                alert("複製失敗，請手動記下序號：" + currentSerial);
+            }
+        } else {
+            // 跳轉至 LINE
+            window.location.href = LINE_OA_URL;
+        }
+    }
+
+    function resetUIAndRedraw() {
+        stepStatus = 1;
+        const afterGroup = document.getElementById('after-draw-group');
+        afterGroup.classList.remove('show');
+        document.getElementById('scroll').classList.remove('active');
+        document.getElementById('win-info').classList.remove('show');
+        document.getElementById('main-title').style.opacity = "1";
+        document.getElementById('reward-text').style.opacity = "0.8";
+        document.getElementById('cat-actor').classList.remove('fade');
+        document.getElementById('res-stars').innerHTML = "";
+        document.querySelectorAll('.fade-in').forEach(el => el.classList.remove('visible'));
+        document.getElementById('res-details').innerHTML = "";
+        
+        const mainBtn = document.getElementById('main-action-btn');
+        mainBtn.innerText = "再抽一次";
+        mainBtn.classList.remove('btn-win-claim', 'btn-green-status');
+        mainBtn.onclick = resetUIAndRedraw;
+        
+        const fHint = document.getElementById('footer-hint-text');
+        fHint.innerText = "今日運勢好不好，一抽就知道";
+        fHint.style.color = "white";
+
+        setTimeout(() => { startDrawing(); }, 200);
+    }
+
+    async function startDrawing() {
+        const initBtn = document.getElementById('init-draw-btn');
+        const afterGroup = document.getElementById('after-draw-group');
+        const cat = document.getElementById('cat-actor');
+        const scroll = document.getElementById('scroll');
+        const hint = document.getElementById('loading-hint');
+        const mainBtn = document.getElementById('main-action-btn');
+        const fHint = document.getElementById('footer-hint-text');
+
+        initBtn.classList.add('hidden');
+        hint.style.opacity = "1"; hint.classList.add('pulse-text');
+        cat.classList.add('shaking');
+        fHint.style.opacity = "0";
+
+        const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
+        
+        await new Promise(r => setTimeout(r, 2500));
+        cat.classList.remove('shaking');
+        cat.classList.add('fade');
+        hint.style.opacity = "0";
+
+        // 判斷是否為超大吉
+        const isSuperLucky = (pick.type === "超大吉");
+
         document.getElementById('res-type').innerText = pick.type;
         document.getElementById('res-intro').innerText = pick.intro;
         
-        // 顯示卷軸
-        document.getElementById('scroll').classList.add('active');
-        
+        // 顯示按鈕群組
+        if (pick.star < 3) afterGroup.classList.add('single-btn');
+        else afterGroup.classList.remove('single-btn');
+
+        scroll.classList.add('active');
+        await new Promise(r => setTimeout(r, 600)); 
+
         // 星星動畫
         const sCont = document.getElementById('res-stars');
-        for(let i=0; i<pick.star; i++) {
-            const s = document.createElement('span'); s.innerText="★";
-            sCont.appendChild(s);
-            setTimeout(() => s.classList.add('pop'), i*200);
+        for (let i = 0; i < pick.star; i++) {
+            const span = document.createElement('span'); span.innerText = "★";
+            sCont.appendChild(span);
+            setTimeout(() => span.classList.add('pop'), 50);
+            await new Promise(r => setTimeout(r, 300)); 
         }
 
-        // 列表動畫
+        // 中獎特殊邏輯
+        if (isSuperLucky) {
+            currentSerial = generateSerial();
+            document.getElementById('win-serial').innerText = "序號: " + currentSerial;
+            
+            mainBtn.innerText = "複製訊息領獎 📋";
+            mainBtn.classList.add('btn-win-claim');
+            mainBtn.onclick = function() { handleClaimProcess(this); };
+            
+            setTimeout(() => {
+                document.getElementById('main-title').style.opacity = "0"; 
+                document.getElementById('reward-text').style.opacity = "0"; 
+                document.getElementById('win-info').classList.add('show');
+                fHint.innerText = "點擊按鈕複製領獎訊息"; 
+                fHint.style.opacity = "1";
+            }, 100);
+        }
+
+        // 內容淡入
+        document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
         const dCont = document.getElementById('res-details');
-        pick.items.forEach((text, i) => {
-            const li = document.createElement('li'); li.innerText = text;
+        for (let item of pick.items) {
+            const li = document.createElement('li'); li.innerText = item;
             dCont.appendChild(li);
-            setTimeout(() => li.classList.add('reveal'), 800 + (i*200));
-        });
-
-        // 設置領獎按鈕 (關鍵在此)
-        const mainBtn = document.getElementById('main-action-btn');
-        mainBtn.innerText = "複製訊息領獎 📋";
-        mainBtn.classList.add('btn-win-claim');
-        mainBtn.onclick = function() { handleCopy(this); };
-
-        document.getElementById('main-title').style.display = "none";
-        document.getElementById('win-info').classList.add('show');
-        document.getElementById('after-draw-group').classList.add('show');
-    }
-
-    function handleCopy(btn) {
-        // 【確定有加入這段文字】
-        const msg = "您好！我抽中了五星超大吉！領取序號是：(" + currentSerial + ")";
-        
-        const helper = document.getElementById('copy-helper');
-        helper.value = msg;
-        helper.select();
-        helper.setSelectionRange(0, 999); // 手機選取
-
-        try {
-            document.execCommand('copy'); // 執行複製
-            isCopied = true;
-            btn.innerText = "前往 LINE 領取 🎁";
-            btn.classList.add('btn-copied');
-            document.getElementById('footer-hint-text').innerText = "✅ 訊息已複製，請至 LINE 貼上發送";
-            btn.onclick = function() { window.location.href = LINE_OA_URL; };
-        } catch (err) {
-            alert("複製失敗，請手動截圖");
+            setTimeout(() => li.classList.add('reveal'), 50);
+            await new Promise(r => setTimeout(r, 200));
         }
+
+        afterGroup.classList.add('show');
     }
 
-    function resetUI() { location.reload(); }
     function shareToLine() {
-        const url = "https://line.me/R/msg/text/?" + encodeURIComponent("我抽到了超大吉！快來試試：\n" + window.location.href);
-        window.location.href = url;
+        const url = window.location.href.split('?')[0];
+        const text = `🧧 2026 運勢揭曉！我剛抽到了「${document.getElementById('res-type').innerText}」！你也快來抽一張！\n👉 ${url}`;
+        window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
     }
 </script>
 </body>
