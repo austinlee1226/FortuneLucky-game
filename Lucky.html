@@ -19,7 +19,6 @@
         .title-group { display: grid; place-items: center; width: 100%; height: 80px; position: relative; }
         .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; margin: 0; transition: opacity 0.4s ease; }
         
-        /* 橫幅與序號包裝 */
         .win-info-group { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; transform: scale(0); opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 20; width: 100%; }
         .win-info-group.show { transform: scale(1); opacity: 1; }
         .win-banner { background: linear-gradient(90deg, transparent, #ff5722, #ff9800, #ff5722, transparent); color: var(--win-color); width: 100%; padding: 8px 0; font-size: 1.6rem; font-weight: 900; text-align: center; animation: winPulse 0.8s infinite alternate; }
@@ -111,18 +110,9 @@
 
     let lastResult = "";
     let currentSerial = "";
-    const OA_ID = "@263pizut"; // 您的 OA ID
+    // 請確認您的 ID，深度連結不加 @
+    const OA_ID = "263pizut"; 
     const LINE_OA_BASE = "https://line.me/R/oaMessage/" + OA_ID + "/"; 
-
-    window.onload = function() {
-        const savedWin = localStorage.getItem('lucky_win_data');
-        if (savedWin) {
-            const data = JSON.parse(savedWin);
-            lastResult = data.type;
-            currentSerial = data.serial;
-            restoreWinUI(data);
-        }
-    };
 
     function generateSerial() {
         const now = new Date();
@@ -137,10 +127,7 @@
     }
 
     function resetUIAndRedraw() {
-        // 清除狀態後直接進入抽獎
-        localStorage.removeItem('lucky_win_data');
-        
-        // 重設 UI
+        // 1. 重設所有狀態
         document.getElementById('after-draw-group').classList.remove('show');
         document.getElementById('scroll').classList.remove('active');
         document.getElementById('win-info-group').classList.remove('show');
@@ -154,33 +141,10 @@
         const mainBtn = document.getElementById('main-action-btn');
         mainBtn.innerText = "再抽一次";
         mainBtn.classList.remove('btn-win-claim');
+        mainBtn.onclick = resetUIAndRedraw; // 恢復預設行為
         
-        startDrawing(); // 直接執行
-    }
-
-    function restoreWinUI(data) {
-        document.getElementById('init-draw-btn').classList.add('hidden');
-        document.getElementById('cat-actor').classList.add('fade');
-        document.getElementById('res-type').innerText = data.type;
-        document.getElementById('res-intro').innerText = data.intro;
-        document.getElementById('scroll').classList.add('active');
-        
-        const sCont = document.getElementById('res-stars');
-        for (let i = 0; i < data.star; i++) {
-            const span = document.createElement('span'); span.innerText = "★";
-            sCont.appendChild(span);
-            span.classList.add('pop');
-        }
-
-        const dCont = document.getElementById('res-details');
-        data.items.forEach(item => {
-            const li = document.createElement('li'); li.innerText = item;
-            dCont.appendChild(li);
-            li.classList.add('reveal');
-        });
-
-        setupWinUI(data.serial);
-        document.getElementById('after-draw-group').classList.add('show');
+        // 2. 直接開始抽籤動畫
+        startDrawing();
     }
 
     function setupWinUI(serial) {
@@ -195,7 +159,7 @@
         document.getElementById('main-title').style.opacity = "0"; 
         document.getElementById('reward-text').style.opacity = "0"; 
         document.getElementById('win-info-group').classList.add('show');
-        document.getElementById('footer-hint-text').innerText = "序號已鎖定，請至 LINE 兌換";
+        document.getElementById('footer-hint-text').innerText = "請截圖至 LINE 兌換";
     }
 
     async function startDrawing() {
@@ -211,13 +175,9 @@
         cat.classList.add('shaking');
         fHint.style.opacity = "0";
 
+        // 亂數抽取
         const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
         lastResult = pick.type;
-
-        if (pick.type === "超大吉") {
-            currentSerial = generateSerial();
-            localStorage.setItem('lucky_win_data', JSON.stringify({...pick, serial: currentSerial}));
-        }
 
         await new Promise(r => setTimeout(r, 2500));
         cat.classList.remove('shaking');
@@ -242,7 +202,9 @@
             await new Promise(r => setTimeout(r, 400)); 
         }
 
+        // 抽中超大吉時產生成序號並顯示 UI
         if (pick.type === "超大吉") {
+            currentSerial = generateSerial();
             setupWinUI(currentSerial);
         }
 
