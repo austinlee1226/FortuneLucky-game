@@ -104,11 +104,13 @@
     const fortuneData = [
         { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 愛情全開，正緣出現機率極高。", "💰 財富精準，有意外回報。", "☘️ 強運當頭，想做的事都有貴人助。", "✈️ 旅行適合，會在旅途收穫靈感。", "💼 事業爆表，展現領導力。"] },
         { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調。", items: ["❤️ 愛情穩定的陪伴。", "💰 財富正在穩健增長。", "☘️ 強運處處小確幸。", "✈️ 旅行適合慢活節奏。", "💼 事業根基紮實。"] },
-        { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間。", items: ["❤️ 愛情打理好自己最重要。", "💰 財富適合保守理財。", "☘️ 強運正在排隊等待。", "✈️ 旅行適合深度休息。", "💼 事業沈默是為了爆發。"] }
+        { id: 3, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 愛情甜蜜如意。", "💰 財富財源廣進。", "☘️ 強運福星高照。", "✈️ 旅行盡興而歸。", "💼 事業勢如破竹。"] }
     ];
 
     let lastResult = "";
     let currentSerial = "";
+    // V0.034 恢復使用的短連結
+    const LINE_OA_URL = "https://lin.ee/4lqVqd3"; 
 
     function generateSerial() {
         const now = new Date();
@@ -158,7 +160,7 @@
         const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
         lastResult = pick.type;
 
-        // 1. 貓咪搖晃動畫 (2.5秒)
+        // 1. 貓咪搖晃動畫
         await new Promise(r => setTimeout(r, 2500));
         cat.classList.remove('shaking');
         cat.classList.add('fade');
@@ -177,7 +179,7 @@
             await new Promise(r => setTimeout(r, 400)); 
         }
 
-        // 4. 顯示大標題 (超大吉/大吉...)
+        // 4. 顯示大標題
         document.getElementById('res-type').innerText = pick.type;
         document.getElementById('res-type').classList.add('show');
         await new Promise(r => setTimeout(r, 500));
@@ -196,17 +198,16 @@
             await new Promise(r => setTimeout(r, 500));
         }
 
-        // 7. 最後才顯示頂部的 恭喜中獎及序號 (如果是超大吉)
+        // 7. 最終顯示橫幅與按鈕邏輯
         if (pick.type === "超大吉") {
             currentSerial = generateSerial();
             const mainBtn = document.getElementById('main-action-btn');
             mainBtn.innerText = "點我領取獎勵 🎁";
             mainBtn.classList.add('btn-win-claim');
-            mainBtn.onclick = () => {
-                const msg = `您好！我抽中了超大吉！\n我的領獎序號是：【${currentSerial}】`;
-                // 使用 R/msg/text 格式，最穩定喚起 App
-                window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
-            };
+            
+            // 恢復 V0.034 直接跳轉短連結
+            mainBtn.onclick = () => { window.location.href = LINE_OA_URL; };
+            
             document.getElementById('serial-display').innerText = `序號：${currentSerial}`;
             
             // 觸發頂部動畫
@@ -217,7 +218,6 @@
             fHint.style.opacity = "1";
         }
 
-        // 8. 顯示底部按鈕
         if (!["超大吉", "大吉", "中吉"].includes(pick.type)) afterGroup.classList.add('single-btn'); 
         else afterGroup.classList.remove('single-btn'); 
         afterGroup.classList.add('show');
