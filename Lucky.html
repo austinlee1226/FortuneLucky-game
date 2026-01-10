@@ -4,47 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>吉運臨門 - 2026 你的開運籤詩</title>
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://austinlee1226.github.io/FortuneLucky-game/Lucky.html">
+    <meta property="og:title" content="🧧 吉運臨門 - 2026 你的開運籤詩">
+    <meta property="og:description" content="2026 運勢如何？快來抽一張你的今日開運籤詩！">
+
     <style>
         :root { --bg-red: #b71c1c; --gold: #ffd700; --paper: #fffdf5; --win-color: #ffeb3b; --btn-win: #d32f2f; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #1a1a1a; margin: 0; display: flex; justify-content: center; align-items: center; height: 100dvh; font-family: -apple-system, "Microsoft JhengHei", sans-serif; overflow: hidden; }
+        
         .game-wrapper { position: relative; background-color: var(--bg-red); width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        
         .header-section { width: 100%; height: 15dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
         .content-section { position: relative; width: 100%; height: 65dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
         .footer-section { width: 100%; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 1000; }
+
         .title-group { display: grid; place-items: center; width: 100%; height: 60px; position: relative; }
-        .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; margin: 0; transition: opacity 0.4s; }
+        .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; margin: 0; z-index: 10; transition: opacity 0.4s ease; }
         .win-banner { grid-area: 1 / 1; transform: scale(0); background: linear-gradient(90deg, transparent, #ff5722, #ff9800, #ff5722, transparent); color: var(--win-color); width: 100%; padding: 10px 0; font-size: 1.6rem; font-weight: 900; text-align: center; z-index: 20; opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .win-banner.show { transform: scale(1); opacity: 1; animation: winPulse 0.8s infinite alternate; }
-        .reward-hint { color: white; font-size: 0.85rem; margin-top: 5px; opacity: 0.8; letter-spacing: 1px; }
+        .reward-hint { color: white; font-size: 0.85rem; margin-top: 5px; opacity: 0.8; letter-spacing: 1px; transition: opacity 0.4s ease; }
+
         .cat-visual { width: 85px; transition: opacity 0.3s; margin-bottom: 5px; }
         .cat-visual.fade { opacity: 0.05; }
         .loading-hint { color: white; font-size: 14px; letter-spacing: 2px; opacity: 0; height: 20px; }
         .pulse-text { animation: textFade 1s infinite alternate; }
-        .scroll-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 92%; height: 95%; background: var(--paper); border: 5px solid #5d4037; border-radius: 12px; padding: 20px 18px; box-shadow: 0 15px 45px rgba(0,0,0,0.7); opacity: 0; z-index: 100; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; display: flex; flex-direction: column; }
+
+        .scroll-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 92%; height: 95%; background: var(--paper); border: 5px solid #5d4037; border-radius: 12px; padding: 20px 18px; box-shadow: 0 15px 45px rgba(0,0,0,0.7); opacity: 0; z-index: 100; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; }
         .scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        .res-header-group { display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #b71c1c; padding-bottom: 4px; margin-bottom: 10px; }
+        .fade-in { opacity: 0; transition: opacity 0.4s ease; }
+        .fade-in.visible { opacity: 1; }
+        
+        .res-header-group { display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid #b71c1c; padding-bottom: 4px; margin-bottom: 10px; flex-shrink: 0; }
         .star-rating { color: var(--gold); font-size: 1.15rem; letter-spacing: 4px; line-height: 1; min-height: 1.15rem; }
         .star-rating span { display: inline-block; transform: scale(0); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .star-rating span.pop { transform: scale(1); }
         .fortune-header { color: #b71c1c; font-size: 2rem; margin: 0; line-height: 1.1; }
-        .serial-tag { background: #b71c1c; color: white; padding: 2px 10px; border-radius: 4px; font-size: 0.75rem; margin-top: 5px; display: none; }
-        .fortune-intro { font-size: 0.9rem; color: #333; line-height: 1.4; margin: 15px 0; font-weight: bold; }
+        
+        /* 序號顯示樣式 */
+        .serial-box { font-size: 0.75rem; color: #b71c1c; background: #fce4ec; padding: 2px 10px; border-radius: 4px; margin-top: 5px; font-weight: bold; border: 1px solid #f8bbd0; display: none; }
+
+        .fortune-intro { font-size: 0.9rem; color: #333; line-height: 1.4; margin: 15px 0; font-weight: bold; flex-shrink: 0; }
         .details-list { text-align: left; padding: 0; list-style: none; margin: 0; flex-grow: 1; overflow-y: auto; }
-        .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: all 0.3s; }
+        .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
         .details-list li.reveal { opacity: 1; transform: translateY(0); }
-        .button-group { display: none; gap: 15px; width: 90%; justify-content: center; }
-        .button-group.show { display: flex; animation: fadeInUp 0.5s forwards; }
-        .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; text-align: center; text-decoration: none; }
-        .btn-win-claim { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #ffffff; }
+
         .draw-btn-large { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer; }
+        
+        .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; }
+        .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; transition: opacity 0.5s ease, transform 0.5s ease; display: flex !important; }
+        .button-group:not(.show) { opacity: 0; display: none !important; transition: none !important; }
+        
+        .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; transition: transform 0.1s; text-align: center; text-decoration: none; }
+        .btn-common:active { transform: translateY(2px); box-shadow: 0 2px 0 #795548; }
+
+        .btn-win-claim { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #ffffff; box-shadow: 0 4px 0 #5d4037; }
+
+        .single-btn #share-btn-text { display: none !important; }
+        .single-btn .btn-common { flex: 0 1 220px; }
         .hidden { display: none !important; }
-        .footer-hint { color: white; font-size: 0.85rem; margin-top: 10px; text-align: center; }
+        .footer-hint { color: white; font-size: 0.85rem; margin-top: 10px; opacity: 1; transition: opacity 0.4s; text-align: center; }
+
         @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.05); } }
         @keyframes textFade { from { opacity: 0.3; } to { opacity: 1; } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .shaking { animation: shakeEffect 0.15s infinite; }
-        @keyframes shakeEffect { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(7deg); } 75% { transform: rotate(-7deg); } }
+        @keyframes shakeEffect { 0%, 100% { transform: rotate(0deg) translateY(0); } 25% { transform: rotate(7deg) translateY(-4px); } 75% { transform: rotate(-7deg) translateY(-4px); } }
     </style>
 </head>
 <body>
@@ -59,18 +85,18 @@
         <div id="scroll" class="scroll-container">
             <div class="res-header-group">
                 <div id="res-stars" class="star-rating"></div>
-                <h2 id="res-type" class="fortune-header"></h2>
-                <div id="serial-display" class="serial-tag">序號：加载中</div>
+                <h2 id="res-type" class="fortune-header fade-in"></h2>
+                <div id="serial-display" class="serial-box"></div>
             </div>
-            <p id="res-intro" class="fortune-intro"></p>
+            <p id="res-intro" class="fortune-intro fade-in"></p>
             <ul id="res-details" class="details-list"></ul>
         </div>
     </div>
     <div class="footer-section">
         <button id="init-draw-btn" class="draw-btn-large" onclick="startDrawing()">立即抽好運</button>
         <div id="after-draw-group" class="button-group">
-            <button id="main-action-btn" class="btn-common" onclick="handleMainAction()">再抽一次</button>
-            <button id="share-btn" class="btn-common" onclick="shareToLine()">分享好運</button>
+            <button id="main-action-btn" class="btn-common" onclick="resetUIAndRedraw()">再抽一次</button>
+            <button id="share-btn-text" class="btn-common" onclick="shareToLine()">分享好運</button>
         </div>
         <p id="footer-hint-text" class="footer-hint">今日運勢好不好，一抽就知道</p>
     </div>
@@ -79,20 +105,29 @@
 <script>
     const fortuneData = [
         { id: 1, star: 5, type: "超大吉", intro: "能量處於上升期，各項資源已到位。建議保持自信，順著直覺大步邁進。", items: ["❤️ 全開，正緣出現機率極高。", "💰 眼光精準，有意外回報。", "☘️ 當頭，想做的事都有貴人助。", "✈️ 適合遠行，會在旅途收穫靈感。", "💼 執行力爆表，展現領導力。"] },
-        { id: 2, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利。"] },
-        // ... 其他籤詩資料可在此擴充
+        { id: 2, star: 3, type: "中吉", intro: "目前環境友善且支持你的決定。建議維持穩定的步調，不必急於求成。", items: ["❤️ 穩定的陪伴是最溫暖的方式。", "💰 正在穩健增長，適合長期持有。", "☘️ 生活處處小確幸，容易中獎。", "✈️ 適合平安行程，享受慢活節奏。", "💼 根基紮實，贏得團隊信任。"] },
+        { id: 3, star: 2, type: "小吉", intro: "正處於積累能量的階段。建議給自己一點留白時間，靜待時機成熟。", items: ["❤️ 緣分急不來，打理好自己最重要。", "💰 適合保守理財，固守資金流。", "☘️ 運氣正在排隊，請平常心等待。", "✈️ 不宜遠行，適合在家深度休息。", "💼 蓄勢待發，沈默是為了爆發。"] },
+        { id: 4, star: 2, type: "小吉", intro: "正站在變革的交叉路口。建議放下舊有的思維，用開放心態迎接。", items: ["❤️ 換個交友圈，會遇到驚艷奇緣。", "💰 出現轉機，有機會轉虧為盈。", "☘️ 逢凶化吉，關鍵時刻總能過關。", "✈️ 隨興的旅程會帶給你驚喜。", "💼 轉換視角，難關立刻變成機會。"] },
+        { id: 5, star: 3, type: "中吉", intro: "適合團隊合作而非單打獨鬥。主動伸出友誼之手，透過分享達成目標。", items: ["❤️ 真誠的告白與承諾，在此刻最動人。", "💰 透過異業合作能分到大利潤。", "☘️ 貴人多在社交場合，請多露面。", "✈️ 與合適夥伴同遊，樂趣會翻倍。", "💼 資源整合能力是職場所向靡武器。"] },
+        { id: 6, star: 4, type: "大吉", intro: "正走在對的道路上，周遭充滿助力。建議保持謙虛，讓良性循環持續。", items: ["❤️ 生活甜蜜如意，彼此都感到安心。", "💰 財源廣進，投資都開花結果。", "☘️ 福星高照，到哪裡都有人給方便。", "✈️ 旅途美景與際遇將成為珍貴回憶。", "💼 勢如破竹，進展極其順利。"] },
+        { id: 7, star: 1, type: "吉", intro: "紛雜的訊息較多，讓你稍感困惑。建議暫時退後一步，梳理優先順序。", items: ["❤️ 需要深度溝通，才能化解猜疑。", "💰 支出請保持謹慎，避免衝動購物。", "☘️ 靈光閃現瞬間，就是轉運開始。", "✈️ 出行注意安全，並預留備案。", "💼 專注處理核心業務。"] },
+        { id: 8, star: 2, type: "小吉", intro: "正處於打地基的關鍵期。建議維持現有的韌性，小步快跑地穩定成長。", items: ["❤️ 慢火熬煮的感情，比速食更持久。", "💰 聚沙成塔，每一分都是金礦。", "☘️ 你的勤奮將換來一份特別好運。", "✈️ 適合勞動型旅行，強健體魄。", "💼 步步為營，專業度讓對手敬佩。"] },
+        { id: 9, star: 4, type: "大吉", intro: "正迎來一段收穫的高峰期。建議放鬆心情去感受成就，並與他人共享。", items: ["❤️ 圓滿時刻，適合談論終身大事。", "💰 財運亨通，有點石成金手感。", "☘️ 驚喜連連，充滿開心的好消息。", "✈️ 盡興而歸，一次完美的盛宴。", "💼 功成名就，地位已確立。"] },
+        { id: 10, star: 1, type: "吉", intro: "適合檢視過往、修正偏差的時機。建議稍微放慢節奏，把能量聚焦。", items: ["❤️ 檢視彼此關係，調整互動頻率。", "💰 重新配置理財，找出潛在風險。", "☘️ 避開鋒芒紛爭，就是最好轉運。", "✈️ 適合短途小憩，讓身心快速充電。", "💼 優化架構，將繁瑣流程重置。"] }
     ];
 
-    const LINE_OA_URL = "https://lin.ee/4lqVqd3";
-    let currentFortune = null;
-    let currentSerial = "";
+    let lastResult = "";
+    let currentSerial = ""; // 儲存當前序號
+    const LINE_OA_URL = "https://lin.ee/4lqVqd3"; 
 
-    // 頁面加載時檢查是否有「超大吉」鎖定
+    // 頁面載入檢查有無中獎鎖定
     window.onload = function() {
-        const savedData = localStorage.getItem('lucky_fortune_win');
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            restoreWinState(data);
+        const savedWin = localStorage.getItem('lucky_win_data');
+        if (savedWin) {
+            const data = JSON.parse(savedWin);
+            lastResult = data.type;
+            currentSerial = data.serial;
+            restoreWinUI(data);
         }
     };
 
@@ -104,112 +139,144 @@
     }
 
     function shareToLine() {
-        // 分享文字不帶序號，保護隱私
-        const shareText = `🧧 太神啦！我剛在【吉運臨門】抽到了「${currentFortune.type}」！\n2026 運勢要爆發了！你也快來試試手氣吧 👇\n${window.location.href.split('?')[0]}`;
-        window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
-    }
-
-    function handleMainAction() {
-        if (currentFortune && currentFortune.type === "超大吉") {
-            const msg = `您好！我抽中了超大吉！\n我的領獎序號是：【${currentSerial}】`;
-            window.location.href = `${LINE_OA_URL}?text=${encodeURIComponent(msg)}`;
-        } else {
-            resetUIAndRedraw();
-        }
-    }
-
-    function restoreWinState(data) {
-        currentFortune = data.fortune;
-        currentSerial = data.serial;
-        document.getElementById('init-draw-btn').classList.add('hidden');
-        showResult(true); // 跳過動畫直接顯示
+        // 分享文字：不含序號
+        const shareText = `🧧 2026 運勢揭曉！我剛抽到了「${lastResult}」籤！\n你也快來抽一張你的開運籤詩吧！\n👉 ${window.location.href.split('?')[0]}`;
+        const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
+        window.location.href = lineUrl;
     }
 
     function resetUIAndRedraw() {
-        localStorage.removeItem('lucky_fortune_win');
-        location.reload(); // 最徹底的重置方式
+        localStorage.removeItem('lucky_win_data');
+        location.reload(); // 透過重整來重置所有狀態最保險
+    }
+
+    // 恢復中獎畫面的函式
+    function restoreWinUI(data) {
+        document.getElementById('init-draw-btn').classList.add('hidden');
+        document.getElementById('cat-actor').classList.add('fade');
+        document.getElementById('res-type').innerText = data.type;
+        document.getElementById('res-intro').innerText = data.intro;
+        
+        const scroll = document.getElementById('scroll');
+        scroll.classList.add('active');
+        
+        const sCont = document.getElementById('res-stars');
+        for (let i = 0; i < data.star; i++) {
+            const span = document.createElement('span'); span.innerText = "★";
+            sCont.appendChild(span);
+            span.classList.add('pop');
+        }
+
+        const dCont = document.getElementById('res-details');
+        data.items.forEach(item => {
+            const li = document.createElement('li'); li.innerText = item;
+            dCont.appendChild(li);
+            li.classList.add('reveal');
+        });
+
+        const mainBtn = document.getElementById('main-action-btn');
+        mainBtn.innerText = "點我領取獎勵 🎁";
+        mainBtn.classList.add('btn-win-claim');
+        mainBtn.onclick = () => {
+            const msg = `您好！我抽中了超大吉！\n我的領獎序號是：【${currentSerial}】`;
+            window.location.href = `${LINE_OA_URL}?text=${encodeURIComponent(msg)}`;
+        };
+
+        document.getElementById('serial-display').innerText = `序號：${currentSerial}`;
+        document.getElementById('serial-display').style.display = "block";
+        document.getElementById('main-title').style.opacity = "0"; 
+        document.getElementById('reward-text').style.opacity = "0"; 
+        document.getElementById('win-banner').classList.add('show');
+        document.getElementById('footer-hint-text').innerText = "序號已鎖定，請截圖領取";
+        document.getElementById('after-draw-group').classList.add('show');
+        document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
     }
 
     async function startDrawing() {
         const initBtn = document.getElementById('init-draw-btn');
+        const afterGroup = document.getElementById('after-draw-group');
         const cat = document.getElementById('cat-actor');
+        const scroll = document.getElementById('scroll');
         const hint = document.getElementById('loading-hint');
+        const fHint = document.getElementById('footer-hint-text');
+        const mainBtn = document.getElementById('main-action-btn');
 
         initBtn.classList.add('hidden');
         hint.style.opacity = "1"; hint.classList.add('pulse-text');
         cat.classList.add('shaking');
+        fHint.style.opacity = "0";
 
-        // 隨機抽選
-        currentFortune = fortuneData[Math.floor(Math.random() * fortuneData.length)];
-        
-        // 如果是超大吉，立即生成序號並存檔鎖定
-        if (currentFortune.type === "超大吉") {
+        const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
+        lastResult = pick.type;
+
+        // 如果中獎，立即鎖定資料
+        if (pick.type === "超大吉") {
             currentSerial = generateSerial();
-            localStorage.setItem('lucky_fortune_win', JSON.stringify({
-                fortune: currentFortune,
+            localStorage.setItem('lucky_win_data', JSON.stringify({
+                ...pick,
                 serial: currentSerial
             }));
         }
 
-        await new Promise(r => setTimeout(r, 2500));
+        await new Promise(r => setTimeout(r, 3000));
+        
         cat.classList.remove('shaking');
         cat.classList.add('fade');
-        hint.style.opacity = "0";
+        hint.style.opacity = "0"; hint.classList.remove('pulse-text');
 
-        showResult(false);
-    }
+        document.getElementById('res-type').innerText = pick.type;
+        document.getElementById('res-intro').innerText = pick.intro;
 
-    async function showResult(isRestored) {
-        const scroll = document.getElementById('scroll');
-        const sCont = document.getElementById('res-stars');
-        const dCont = document.getElementById('res-details');
-        const mainBtn = document.getElementById('main-action-btn');
-        const fHint = document.getElementById('footer-hint-text');
+        const high = ["超大吉", "大吉", "中吉"];
+        if (!high.includes(pick.type)) { 
+            afterGroup.classList.add('single-btn'); 
+        } else { 
+            afterGroup.classList.remove('single-btn'); 
+        }
 
-        document.getElementById('res-type').innerText = currentFortune.type;
-        document.getElementById('res-intro').innerText = currentFortune.intro;
-        
         scroll.classList.add('active');
-        if(!isRestored) await new Promise(r => setTimeout(r, 600));
+        await new Promise(r => setTimeout(r, 600)); 
 
-        // 星星動畫
-        sCont.innerHTML = "";
-        for (let i = 0; i < currentFortune.star; i++) {
+        const sCont = document.getElementById('res-stars');
+        for (let i = 0; i < pick.star; i++) {
             const span = document.createElement('span'); span.innerText = "★";
             sCont.appendChild(span);
-            if(isRestored) span.classList.add('pop');
-            else {
-                setTimeout(() => span.classList.add('pop'), 50);
-                await new Promise(r => setTimeout(r, 400));
-            }
+            setTimeout(() => span.classList.add('pop'), 50);
+            await new Promise(r => setTimeout(r, 400)); 
         }
 
-        // 超大吉特殊處理
-        if (currentFortune.type === "超大吉") {
+        if (pick.type === "超大吉") {
+            mainBtn.innerText = "點我領取獎勵 🎁";
+            mainBtn.classList.add('btn-win-claim');
+            mainBtn.onclick = () => {
+                const msg = `您好！我抽中了超大吉！\n我的領獎序號是：【${currentSerial}】`;
+                window.location.href = `${LINE_OA_URL}?text=${encodeURIComponent(msg)}`;
+            };
+            
             document.getElementById('serial-display').innerText = `序號：${currentSerial}`;
             document.getElementById('serial-display').style.display = "block";
-            mainBtn.innerText = "立即領取獎勵 🎁";
-            mainBtn.classList.add('btn-win-claim');
-            
-            document.getElementById('main-title').style.opacity = "0";
-            document.getElementById('reward-text').style.opacity = "0";
-            document.getElementById('win-banner').classList.add('show');
-            fHint.innerText = "序號已鎖定，請至 LINE 兌換";
+
+            setTimeout(() => {
+                document.getElementById('main-title').style.opacity = "0"; 
+                document.getElementById('reward-text').style.opacity = "0"; 
+                document.getElementById('win-banner').classList.add('show');
+                fHint.innerText = "請截圖至官方LINE領取獎勵"; 
+                fHint.style.opacity = "1";
+            }, 100);
         }
 
-        // 顯示內容細節
-        dCont.innerHTML = "";
-        for (const item of currentFortune.items) {
-            const li = document.createElement('li'); li.innerText = item;
+        document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+        await new Promise(r => setTimeout(r, 600));
+
+        const dCont = document.getElementById('res-details');
+        for (let i = 0; i < pick.items.length; i++) {
+            const li = document.createElement('li'); li.innerText = pick.items[i];
             dCont.appendChild(li);
-            if(isRestored) li.classList.add('reveal');
-            else {
-                setTimeout(() => li.classList.add('reveal'), 50);
-                await new Promise(r => setTimeout(r, 300));
-            }
+            setTimeout(() => li.classList.add('reveal'), 50);
+            await new Promise(r => setTimeout(r, 300));
         }
 
-        document.getElementById('after-draw-group').classList.add('show');
+        afterGroup.classList.add('show');
     }
 </script>
 </body>
