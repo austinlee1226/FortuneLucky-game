@@ -4,20 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>吉運臨門 - 2026 你的開運籤詩</title>
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://austinlee1226.github.io/FortuneLucky-game/Lucky.html">
+    <meta property="og:title" content="🧧 吉運臨門 - 2026 你的開運籤詩">
+    <meta property="og:description" content="2026 運勢如何？快來抽一張你的今日開運籤詩！">
+
     <style>
-        :root { --bg-red: #b71c1c; --gold: #ffd700; --paper: #fffdf5; --win-color: #ffeb3b; }
+        :root { --bg-red: #b71c1c; --gold: #ffd700; --paper: #fffdf5; --win-color: #ffeb3b; --btn-win: #d32f2f; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: #1a1a1a; margin: 0; display: flex; justify-content: center; align-items: center; height: 100dvh; font-family: -apple-system, "Microsoft JhengHei", sans-serif; overflow: hidden; }
+        
         .game-wrapper { position: relative; background-color: var(--bg-red); width: 100%; max-width: 430px; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         
         .header-section { width: 100%; height: 15dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        .content-section { position: relative; width: 100%; height: 65dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
+        .footer-section { width: 100%; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 1000; }
+
         .title-group { display: grid; place-items: center; width: 100%; height: 60px; position: relative; }
         .title { grid-area: 1 / 1; color: var(--gold); font-size: 1.8rem; letter-spacing: 5px; margin: 0; z-index: 10; transition: opacity 0.3s; }
         .win-banner { grid-area: 1 / 1; transform: scale(0); background: linear-gradient(90deg, transparent, #ff5722, #ff9800, #ff5722, transparent); color: var(--win-color); width: 100%; padding: 10px 0; font-size: 1.6rem; font-weight: 900; text-align: center; z-index: 20; opacity: 0; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .win-banner.show { transform: scale(1); opacity: 1; animation: winPulse 0.8s infinite alternate; }
         .reward-hint { color: white; font-size: 0.85rem; margin-top: 5px; opacity: 0.8; letter-spacing: 1px; }
 
-        .content-section { position: relative; width: 100%; height: 65dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
         .cat-visual { width: 85px; transition: opacity 0.3s; margin-bottom: 5px; }
         .cat-visual.fade { opacity: 0.05; }
         .loading-hint { color: white; font-size: 14px; letter-spacing: 2px; opacity: 0; height: 20px; }
@@ -38,13 +47,19 @@
         .details-list li { padding: 8px 0; border-bottom: 1px dashed #d7ccc8; font-size: 0.95rem; color: #444; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
         .details-list li.reveal { opacity: 1; transform: translateY(0); }
 
-        .footer-section { width: 100%; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 1000; }
         .draw-btn-large { background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 16px 60px; font-size: 1.5rem; font-weight: 900; border-radius: 50px; box-shadow: 0 6px 0 #795548; cursor: pointer; }
+        
+        /* 按鈕群組設定 */
         .button-group { display: flex; gap: 15px; width: 90%; justify-content: center; opacity: 0; transform: translateY(20px); pointer-events: none; }
         .button-group.show { opacity: 1; transform: translateY(0); pointer-events: auto; transition: opacity 0.5s ease, transform 0.5s ease; display: flex !important; }
         .button-group:not(.show) { opacity: 0; display: none !important; transition: none !important; }
-        .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; }
+        
+        .btn-common { flex: 1; background: linear-gradient(180deg, #ffeb3b, #fbc02d); color: #b71c1c; border: none; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 30px; box-shadow: 0 4px 0 #795548; cursor: pointer; transition: transform 0.1s; text-align: center; text-decoration: none; }
         .btn-common:active { transform: translateY(2px); box-shadow: 0 2px 0 #795548; }
+
+        /* 超大吉特殊按鈕樣式 (深紅金字) */
+        .btn-win-claim { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #ffffff; box-shadow: 0 4px 0 #5d4037; }
+
         .single-btn #share-btn-text { display: none !important; }
         .single-btn .btn-common { flex: 0 1 220px; }
         .hidden { display: none !important; }
@@ -74,7 +89,7 @@
     <div class="footer-section">
         <button id="init-draw-btn" class="draw-btn-large" onclick="startDrawing()">立即抽好運</button>
         <div id="after-draw-group" class="button-group">
-            <button class="btn-common" onclick="resetUIAndRedraw()">再抽一次</button>
+            <button id="main-action-btn" class="btn-common" onclick="resetUIAndRedraw()">再抽一次</button>
             <button id="share-btn-text" class="btn-common" onclick="shareToLine()">分享好運</button>
         </div>
         <p id="footer-hint-text" class="footer-hint">今日運勢好不好，一抽就知道</p>
@@ -93,12 +108,16 @@
         { id: 9, star: 4, type: "大吉", intro: "正迎來一段收穫的高峰期。建議放鬆心情去感受成就，並與他人共享。", items: ["❤️ 圓滿時刻，適合談論終身大事。", "💰 財運亨通，有點石成金手感。", "☘️ 驚喜連連，充滿開心的好消息。", "✈️ 盡興而歸，一次完美的盛宴。", "💼 功成名就，地位已確立。"] },
         { id: 10, star: 1, type: "吉", intro: "適合檢視過往、修正偏差的時機。建議稍微放慢節奏，把能量聚焦。", items: ["❤️ 檢視彼此關係，調整互動頻率。", "💰 重新配置理財，找出潛在風險。", "☘️ 避開鋒芒紛爭，就是最好轉運。", "✈️ 適合短途小憩，讓身心快速充電。", "💼 優化架構，將繁瑣流程重置。"] }
     ];
+
     let lastResult = "";
+    const LINE_OA_URL = "https://lin.ee/4lqVqd3"; // 您的官方帳號連結
+
     function shareToLine() {
         const shareText = `🧧 2026 運勢揭曉！我剛抽到了「${lastResult}」籤！\n你也快來抽一張你的開運籤詩吧！\n👉 ${window.location.href.split('?')[0]}`;
         const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
         window.location.href = lineUrl;
     }
+
     function resetUIAndRedraw() {
         const afterGroup = document.getElementById('after-draw-group');
         afterGroup.classList.remove('show');
@@ -110,9 +129,17 @@
         document.getElementById('res-stars').innerHTML = "";
         document.querySelectorAll('.fade-in').forEach(el => el.classList.remove('visible'));
         document.getElementById('res-details').innerHTML = "";
+        
+        // 重置按鈕狀態
+        const mainBtn = document.getElementById('main-action-btn');
+        mainBtn.innerText = "再抽一次";
+        mainBtn.classList.remove('btn-win-claim');
+        mainBtn.onclick = resetUIAndRedraw;
         afterGroup.classList.remove('single-btn');
+
         setTimeout(() => { startDrawing(); }, 200);
     }
+
     async function startDrawing() {
         const initBtn = document.getElementById('init-draw-btn');
         const afterGroup = document.getElementById('after-draw-group');
@@ -120,23 +147,49 @@
         const scroll = document.getElementById('scroll');
         const hint = document.getElementById('loading-hint');
         const fHint = document.getElementById('footer-hint-text');
+        const mainBtn = document.getElementById('main-action-btn');
+
         initBtn.classList.add('hidden');
         hint.style.opacity = "1"; hint.classList.add('pulse-text');
         cat.classList.add('shaking');
         fHint.style.opacity = "0";
+
         const pick = fortuneData[Math.floor(Math.random() * fortuneData.length)]; 
         lastResult = pick.type;
+
         await new Promise(r => setTimeout(r, 3000));
+        
         cat.classList.remove('shaking');
         cat.classList.add('fade');
         hint.style.opacity = "0"; hint.classList.remove('pulse-text');
+
         document.getElementById('res-type').innerText = pick.type;
         document.getElementById('res-intro').innerText = pick.intro;
+
+        // 按鈕顯示邏輯
         const high = ["超大吉", "大吉", "中吉"];
-        if (!high.includes(pick.type)) { afterGroup.classList.add('single-btn'); }
-        else { afterGroup.classList.remove('single-btn'); }
+        if (!high.includes(pick.type)) { 
+            afterGroup.classList.add('single-btn'); 
+        } else { 
+            afterGroup.classList.remove('single-btn'); 
+        }
+
+        // 超大吉特殊按鈕處理
+        if (pick.type === "超大吉") {
+            mainBtn.innerText = "點我領取獎勵 🎁";
+            mainBtn.classList.add('btn-win-claim');
+            mainBtn.onclick = () => { window.location.href = LINE_OA_URL; };
+            
+            document.getElementById('main-title').style.opacity = "0"; 
+            document.getElementById('reward-text').style.opacity = "0"; 
+            document.getElementById('win-banner').classList.add('show');
+            fHint.innerText = "請截圖至官方LINE領取獎勵"; 
+            fHint.style.opacity = "1";
+        }
+
         scroll.classList.add('active');
         await new Promise(r => setTimeout(r, 600)); 
+
         const sCont = document.getElementById('res-stars');
         for (let i = 0; i < pick.star; i++) {
             const span = document.createElement('span'); span.innerText = "★";
@@ -144,8 +197,10 @@
             setTimeout(() => span.classList.add('pop'), 50);
             await new Promise(r => setTimeout(r, 400)); 
         }
+
         document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
         await new Promise(r => setTimeout(r, 600));
+
         const dCont = document.getElementById('res-details');
         for (let i = 0; i < pick.items.length; i++) {
             const li = document.createElement('li'); li.innerText = pick.items[i];
@@ -153,12 +208,7 @@
             setTimeout(() => li.classList.add('reveal'), 50);
             await new Promise(r => setTimeout(r, 300));
         }
-        if (pick.type === "超大吉") {
-            document.getElementById('main-title').style.opacity = "0"; 
-            document.getElementById('reward-text').style.opacity = "0"; 
-            document.getElementById('win-banner').classList.add('show');
-            fHint.innerText = "請截圖至粉絲團換取獎勵"; fHint.style.opacity = "1";
-        }
+
         afterGroup.classList.add('show');
     }
 </script>
