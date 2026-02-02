@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V1.7</title>
+    <title>吉運臨門 - Pixel GD V1.9</title>
     <style>
+        /* 1. 全域環境與縮放容器 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
         #game-stage { position: absolute; width: 720px; height: 1280px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1); transform-origin: center; background-color: #b71c1c; overflow: hidden; }
         .layer { position: absolute; transform: translate(-50%, -50%); pointer-events: none; user-select: none; }
         .interactive { pointer-events: auto; cursor: pointer; }
 
-        /* 圖層定位 (依據 PS) */
+        /* 2. 圖層定位 (依據 PS 座標) */
         #bg-main { left: 360px; top: 640px; width: 720px; z-index: 1; }
         #char-cat { left: 384px; top: 745px; width: 515px; z-index: 50; }
         #scroll-container { position: absolute; left: 360px; top: 725px; width: 708px; height: 855px; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 100; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
         #scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         #scroll-bg { width: 100%; height: 100%; top: 50%; left: 50%; }
 
-        /* 按鈕座標 (x233, y1158 / 262x76) */
+        /* 按鈕座標：抽籤按鈕(初始) / 重抽與分享(結果) */
         #btn-draw { left: 352px; top: 1158px; width: 333px; z-index: 200; }
         #btn-redraw { left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
+        #btn-share { left: 491px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
 
-        /* 文字排版 (鎖定頂部 300px) */
+        /* 3. 直書文字區 (鎖定頂部 300px) */
         #res-type-img { left: 50%; top: 160px; width: 320px; z-index: 110; } 
         .fortune-text { 
             position: absolute; z-index: 110; color: #3e2723; 
@@ -32,10 +34,12 @@
             justify-content: flex-start; align-items: center;
             transform: translateX(-50%); height: 420px; overflow: hidden; 
         }
-        #res-destiny { left: 478px; top: 300px; width: 80px; white-space: normal; }
-        #res-career  { left: 331px; top: 300px; width: 40px; white-space: nowrap; }
-        #res-love    { left: 204px; top: 300px; width: 40px; white-space: nowrap; }
+        /* 本命區支援兩排，其餘單排 */
+        #res-destiny { left: 478px; top: 300px; width: 85px; white-space: normal; }
+        #res-career  { left: 331px; top: 300px; width: 45px; white-space: nowrap; }
+        #res-love    { left: 204px; top: 300px; width: 45px; white-space: nowrap; }
 
+        /* 4. 動效與狀態 */
         .shaking { animation: shakeLoop 0.15s infinite; }
         @keyframes shakeLoop { 0%, 100% { transform: translate(-50%, -50%) rotate(0deg); } 25% { transform: translate(-50%, -52%) rotate(3deg); } 75% { transform: translate(-50%, -52%) rotate(-3deg); } }
         .hidden { display: none !important; }
@@ -58,6 +62,7 @@
 
     <img id="btn-draw" class="layer interactive btn-active" src="assets/btn_draw.webp" onclick="handleStartDraw()">
     <img id="btn-redraw" class="layer interactive btn-active hidden" src="assets/btn_redraw.webp" onclick="handleReset()">
+    <img id="btn-share" class="layer interactive btn-active hidden" src="assets/btn_share.webp" onclick="handleShare()">
 </div>
 
 <script>
@@ -65,19 +70,16 @@
     let fortuneSheetData = [];
     let isDrawing = false;
     let dataReady = false;
+    let currentResult = null;
 
-    // 真正的讀取邏輯：只在需要時才抓資料
+    // 現場抓取資料函式
     async function fetchDataOnTheFly() {
-        dataReady = false; // 重置狀態
+        dataReady = false;
         try {
             const response = await fetch(API_URL);
             fortuneSheetData = await response.json();
             dataReady = true;
-            console.log("Pixel GD: 現場抓取資料成功");
-        } catch (err) { 
-            console.error("API Error", err); 
-            alert("網路連線失敗，請檢查網路後重試");
-        }
+        } catch (err) { console.error("API Error", err); }
     }
 
     function resizeGame() {
@@ -87,19 +89,19 @@
     }
 
     window.addEventListener('resize', resizeGame);
-    // 網頁啟動時不呼叫 initData，只處理縮放
-    window.onload = () => { resizeGame(); }; 
+    window.onload = () => { resizeGame(); };
 
+    // 啟動抽籤流程
     function startDrawingProcess() {
         isDrawing = true;
         document.getElementById('char-cat').classList.add('shaking');
-
-        // 在貓咪開始抖動的瞬間，發起資料請求
+        
+        // 抖動開始時才抓資料
         fetchDataOnTheFly();
 
         const startTime = Date.now();
         const checkInterval = setInterval(() => {
-            // 條件：必須抖滿 2.5 秒，且當次發起的資料請求已經完成
+            // 必須抖滿 2.5 秒且資料到位
             if (Date.now() - startTime >= 2500 && dataReady) {
                 clearInterval(checkInterval);
                 showResult();
@@ -115,31 +117,63 @@
 
     function showResult() {
         document.getElementById('char-cat').classList.remove('shaking');
-        const result = fortuneSheetData[Math.floor(Math.random() * fortuneSheetData.length)];
+        currentResult = fortuneSheetData[Math.floor(Math.random() * fortuneSheetData.length)];
         
         const typeImg = document.getElementById('res-type-img');
-        typeImg.src = `assets/type_${result.type}.webp`;
+        typeImg.src = `assets/type_${currentResult.type}.webp`;
         typeImg.classList.remove('hidden');
 
-        document.getElementById('res-destiny').innerText = result.destiny;
-        document.getElementById('res-career').innerText = result.career;
-        document.getElementById('res-love').innerText = result.love;
+        document.getElementById('res-destiny').innerText = currentResult.destiny;
+        document.getElementById('res-career').innerText = currentResult.career;
+        document.getElementById('res-love').innerText = currentResult.love;
 
         document.getElementById('scroll-container').classList.add('active');
         
         setTimeout(() => {
             document.getElementById('btn-redraw').classList.remove('hidden');
+            document.getElementById('btn-share').classList.remove('hidden');
         }, 500);
     }
 
     function handleReset() {
         document.getElementById('btn-redraw').classList.add('hidden');
+        document.getElementById('btn-share').classList.add('hidden');
         document.getElementById('scroll-container').classList.remove('active');
         document.getElementById('res-type-img').classList.add('hidden');
+        
+        // 縮回後自動開始下一次抽籤
+        setTimeout(() => { startDrawingProcess(); }, 400); 
+    }
 
-        setTimeout(() => {
-            startDrawingProcess(); // 重抽也同樣觸發「現場抓取」
-        }, 400); 
+    // 分享功能 (含 LINE 優化)
+    function handleShare() {
+        const shareText = `吉運臨門！我抽到了：【${currentResult.type}】`;
+        const shareUrl = window.location.href;
+        const fullMessage = `${shareText}\n快來測測你的運勢：${shareUrl}`;
+
+        const isLine = navigator.userAgent.includes("Line");
+
+        if (isLine) {
+            // LINE URL Scheme 方案
+            const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(fullMessage)}`;
+            window.location.href = lineUrl;
+        } else if (navigator.share) {
+            // 原生 Web Share 方案
+            navigator.share({
+                title: '吉運臨門 - Pixel GD',
+                text: shareText,
+                url: shareUrl
+            }).catch(e => console.log("Share failed", e));
+        } else {
+            // 備案：自動複製
+            const temp = document.createElement("textarea");
+            temp.value = fullMessage;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            alert("連結已複製，快傳給朋友吧！");
+        }
     }
 </script>
 
