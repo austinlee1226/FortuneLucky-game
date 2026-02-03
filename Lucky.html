@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V4.8</title>
+    <title>吉運臨門 - Debug Mode</title>
     <style>
         /* 基礎環境 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
@@ -12,61 +12,42 @@
         .layer { position: absolute; pointer-events: none; user-select: none; }
         .interactive { pointer-events: auto; cursor: pointer; }
 
-        /* 背景與標語 */
+        /* Debug UI 樣式 */
+        #debug-ui { 
+            position: absolute; top: 10px; left: 10px; z-index: 999; 
+            background: rgba(0,0,0,0.7); color: #fff; padding: 10px; 
+            font-size: 14px; border-radius: 5px; pointer-events: auto;
+        }
+        #debug-ui select { font-size: 16px; margin-top: 5px; }
+
         #bg-main { left: 0; top: 0; width: 720px; z-index: 1; }
         #slogan { left: 75px; top: 95px; width: 561px; height: 209px; z-index: 60; }
 
-        /* --- 貓咪容器方案 (解決 iOS 掉落問題) --- */
-        #cat-wrapper { 
-            left: 384px; top: 745px; width: 515px; z-index: 50;
-            transform: translate(-50%, -50%); 
-        }
+        #cat-wrapper { left: 384px; top: 745px; width: 515px; z-index: 50; transform: translate(-50%, -50%); }
         #char-cat { width: 100%; height: auto; display: block; }
 
-        /* 呼吸動畫 */
         .breathing { animation: breathLoop 3s ease-in-out infinite; }
-        @keyframes breathLoop {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02) translateY(-10px); }
-        }
+        @keyframes breathLoop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02) translateY(-10px); } }
 
-        /* 抖動動畫 */
         .shaking { animation: shakeLoop 0.15s infinite; }
-        @keyframes shakeLoop { 
-            0%, 100% { transform: rotate(0deg); } 
-            25% { transform: rotate(3deg) translateY(-5px); } 
-            75% { transform: rotate(-3deg) translateY(-5px); } 
-        }
+        @keyframes shakeLoop { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(3deg) translateY(-5px); } 75% { transform: rotate(-3deg) translateY(-5px); } }
 
-        /* 煙火綻放 */
         .firework { width: 194px; height: 200px; z-index: 10; opacity: 0; }
         .fw-loop { animation: fw绽放 2s infinite ease-out; }
         #fw-1 { left: 31px; top: 441px; }
         #fw-2 { left: 680px; top: 464px; animation-delay: 1s; }
-        @keyframes fw绽放 {
-            0% { transform: scale(0); opacity: 0; }
-            20% { opacity: 1; }
-            70% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
+        @keyframes fw绽放 { 0% { transform: scale(0); opacity: 0; } 20% { opacity: 1; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
-        /* 捲軸與貼圖 */
-        #scroll-container { 
-            left: 360px; top: 725px; width: 708px; height: 855px; z-index: 100;
-            opacity: 0; transform: translate(-50%, -50%) scale(0);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
-        }
+        #scroll-container { left: 360px; top: 725px; width: 708px; height: 855px; z-index: 100; opacity: 0; transform: translate(-50%, -50%) scale(0); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
         #scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         #res-type-img { left: 355px; top: 150px; width: auto; max-width: 250px; z-index: 150; opacity: 0; transform: translate(-50%, -50%); transition: opacity 0.6s ease-out; }
         #res-type-img.show { opacity: 1; }
 
-        /* 文字排版 */
         .fortune-text { position: absolute; z-index: 110; color: #3e2723; font-family: "Microsoft JhengHei", sans-serif; font-weight: bold; line-height: 1.5; font-size: 26px; writing-mode: vertical-rl; text-orientation: upright; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transform: translateX(-50%); height: 420px; overflow: hidden; }
         #res-destiny { left: 453px; top: 300px; width: 110px; white-space: normal; }
         #res-career  { left: 331px; top: 300px; width: 85px; white-space: normal; }
         #res-love    { left: 204px; top: 300px; width: 85px; white-space: normal; }
 
-        /* 按鈕 */
         #btn-draw { left: 352px; top: 1158px; width: 333px; z-index: 200; transform: translate(-50%, -50%); }
         #btn-redraw { left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 210; transform: translate(-50%, -50%); }
         #btn-share { left: 491px; top: 1158px; width: 262px; height: 76px; z-index: 210; transform: translate(-50%, -50%); }
@@ -76,6 +57,19 @@
     </style>
 </head>
 <body>
+
+<div id="debug-ui">
+    測試模式：<br>
+    <select id="debug-force-type">
+        <option value="none">隨機抽取</option>
+        <option value="超金運">必中：超金運</option>
+        <option value="大吉">必中：大吉</option>
+        <option value="中吉">必中：中吉</option>
+        <option value="小吉">必中：小吉</option>
+        <option value="吉">必中：吉</option>
+        <option value="中平">必中：中平</option>
+    </select>
+</div>
 
 <div id="game-stage">
     <img id="bg-main" class="layer" src="assets/bg_main.webp">
@@ -107,7 +101,6 @@
     let dataReady = false;
     let currentResult = null;
 
-    // 已修正超金運檔名
     const typeFileMap = { 
         "超金運": "supergold", 
         "大吉": "biggold", 
@@ -158,7 +151,19 @@
         catImg.classList.remove('shaking');
         catImg.classList.add('breathing');
         
-        currentResult = fortuneSheetData[Math.floor(Math.random() * fortuneSheetData.length)];
+        // Debug 邏輯：檢查是否有強制指定的結果
+        const forceType = document.getElementById('debug-force-type').value;
+        if (forceType !== "none") {
+            const filtered = fortuneSheetData.filter(d => d.type.trim() === forceType);
+            if (filtered.length > 0) {
+                currentResult = filtered[Math.floor(Math.random() * filtered.length)];
+            } else {
+                currentResult = fortuneSheetData[Math.floor(Math.random() * fortuneSheetData.length)];
+            }
+        } else {
+            currentResult = fortuneSheetData[Math.floor(Math.random() * fortuneSheetData.length)];
+        }
+        
         const typeImg = document.getElementById('res-type-img');
         typeImg.classList.remove('show');
         typeImg.src = `assets/${typeFileMap[currentResult.type.trim()] || "gold"}.webp`;
