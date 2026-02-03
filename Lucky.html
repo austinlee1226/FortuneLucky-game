@@ -1,83 +1,198 @@
-<style>
-    /* 強化彩帶容器：確保 z-index 最高，且不影響點擊 */
-    #confetti-cannon { 
-        position: absolute; 
-        left: 360px; 
-        top: 350px; /* 調整到捲軸上方一點 */
-        width: 1px; 
-        height: 1px; 
-        z-index: 900; /* 極高層級，確保噴在最前面 */
-        pointer-events: none; 
-    }
-    .confetti { 
-        position: absolute; 
-        width: 12px; 
-        height: 12px; 
-        border-radius: 2px;
-        opacity: 0; 
-    }
-</style>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>吉運臨門 - Pixel JD V4.23</title>
+    <style>
+        /* 基礎畫布設定 (720x1280) */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        #game-stage { position: absolute; width: 720px; height: 1280px; left: 50%; top: 50%; transform: translate(-50%, -50%); transform-origin: center; background-color: #b71c1c; overflow: hidden; }
+        .layer { position: absolute; pointer-events: none; user-select: none; }
+        .interactive { pointer-events: auto; cursor: pointer; }
+
+        /* Debug UI */
+        #debug-ui { position: absolute; top: 20px; left: 20px; z-index: 999; background: rgba(0,0,0,0.8); color: #00ff00; padding: 15px; border-radius: 5px; pointer-events: auto; font-family: monospace; }
+
+        /* 背景與煙火 */
+        #bg-main { left: 0; top: 0; width: 720px; z-index: 1; }
+        #slogan { left: 75px; top: 95px; width: 561px; z-index: 60; }
+        .firework { width: 194px; height: 200px; z-index: 10; opacity: 0; }
+        .fw-loop { animation: fw绽放 2s infinite ease-out; }
+        #fw-1 { left: 31px; top: 350px; }
+        #fw-2 { left: 500px; top: 464px; animation-delay: 1s; }
+        @keyframes fw绽放 { 0% { transform: scale(0); opacity: 0; } 20% { opacity: 1; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+
+        /* 貓咪角色 */
+        #cat-wrapper { left: 384px; top: 745px; width: 515px; z-index: 50; transform: translate(-50%, -50%); }
+        #char-cat { width: 100%; height: auto; }
+
+        /* 捲軸容器 */
+        #scroll-container { left: 360px; top: 725px; width: 708px; height: 855px; z-index: 100; opacity: 0; transform: translate(-50%, -50%) scale(0); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        /* 序號底圖與文字 - 修正位置 top: 92px (原本 389px) */
+        #serial-container { position: absolute; left: 360px; top: 92px; width: 303px; height: 25px; z-index: 105; transform: translate(-50%, -50%); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        #serial-bg { width: 100%; height: 100%; }
+        #serial-text { position: absolute; color: #fff; font-family: monospace; font-weight: bold; font-size: 16px; letter-spacing: 1px; }
+
+        /* 籤詩樣式 */
+        #res-type-img { left: 355px; top: 150px; width: auto; max-width: 250px; z-index: 150; opacity: 0; transform: translate(-50%, -50%); transition: opacity 0.6s; }
+        #res-type-img.show { opacity: 1; }
+        .fortune-text { position: absolute; z-index: 110; color: #3e2723; font-family: "Microsoft JhengHei", sans-serif; font-weight: bold; font-size: 26px; writing-mode: vertical-rl; text-orientation: upright; height: 420px; transform: translateX(-50%); }
+        #res-destiny { left: 453px; top: 300px; }
+        #res-career  { left: 331px; top: 300px; }
+        #res-love    { left: 204px; top: 300px; }
+
+        /* 按鈕座標 */
+        #btn-draw { left: 352px; top: 1158px; width: 333px; z-index: 200; transform: translate(-50%, -50%); }
+        .left-btn { left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 220; transform: translate(-50%, -50%); }
+        #btn-share { left: 491px; top: 1158px; width: 262px; height: 76px; z-index: 210; transform: translate(-50%, -50%); }
+
+        /* 動畫 */
+        .hidden { display: none !important; }
+        .breathing { animation: breathLoop 3s ease-in-out infinite; }
+        @keyframes breathLoop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02) translateY(-10px); } }
+        .shaking { animation: shakeLoop 0.15s infinite; }
+        @keyframes shakeLoop { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(3deg) translateY(-5px); } 75% { transform: rotate(-3deg) translateY(-5px); } }
+    </style>
+</head>
+<body>
+
+<div id="debug-ui">
+    [DEBUG] Pixel JD <br>
+    <select id="debug-force-type">
+        <option value="none">隨機選取</option>
+        <option value="超金運">測試：超金運</option>
+    </select>
+</div>
 
 <div id="game-stage">
-    <div id="confetti-cannon" class="layer"></div>
+    <img id="bg-main" class="layer" src="assets/bg_main.webp">
+    <img id="slogan" class="layer" src="assets/slogan.webp">
+    <img id="fw-1" class="layer firework fw-loop" src="assets/firework.webp">
+    <img id="fw-2" class="layer firework fw-loop" src="assets/firework.webp">
+    
+    <div id="cat-wrapper" class="layer">
+        <img id="char-cat" class="breathing" src="assets/char_cat.webp">
+    </div>
+
+    <div id="scroll-container" class="layer">
+        <img src="assets/scroll_bg.webp" class="layer" style="width:100%; height:100%; left:0; top:0;">
+        <div id="serial-container" class="layer">
+            <img src="assets/serial_bg.webp" id="serial-bg">
+            <div id="serial-text">點擊複製領取序號</div>
+        </div>
+        <img id="res-type-img" class="layer" src="">
+        <div id="res-destiny" class="fortune-text"></div>
+        <div id="res-career" class="fortune-text"></div>
+        <div id="res-love" class="fortune-text"></div>
+    </div>
+
+    <img id="btn-draw" class="layer interactive" src="assets/btn_draw.webp" onclick="handleStartDraw()">
+    <img id="btn-redraw" class="layer left-btn interactive hidden" src="assets/btn_redraw.webp" onclick="handleReset()">
+    <img id="btn-copy" class="layer left-btn interactive hidden" src="assets/btn_copy.webp" onclick="handleCopyClick()">
+    <img id="btn-reward" class="layer left-btn interactive hidden" src="assets/btn_get_reward.webp" onclick="handleRewardClick()">
+    <img id="btn-share" class="layer interactive hidden" src="assets/btn_share.webp" onclick="handleShare()">
 </div>
 
 <script>
-    // 修正後的噴彩帶函式
-    function spawnConfetti() {
-        const colors = ['#FFD700', '#FF4500', '#FF69B4', '#00FF7F', '#1E90FF', '#FFFFFF'];
-        const cannon = document.getElementById('confetti-cannon');
-        
-        // 增加到 80 顆，讓效果更華麗
-        for (let i = 0; i < 80; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'confetti';
-            dot.style.background = colors[Math.floor(Math.random() * colors.length)];
-            cannon.appendChild(dot);
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfeuBAEJ8TZeP9beZj2cjWHKLIvzbZjJxZE6F5k6tfMnOmZLeLyJI7cg-f9xHu8vz6_w/exec";
+    let fortuneSheetData = [];
+    let isDrawing = false;
+    let dataReady = false;
 
-            // 計算噴射角度與力量
-            const angle = (Math.random() * 180 - 180) * (Math.PI / 180); // 向上半圓噴發
-            const velocity = 10 + Math.random() * 15;
-            const tx = Math.cos(angle) * (200 + Math.random() * 300);
-            const ty = Math.sin(angle) * (200 + Math.random() * 300) + 500; // 最終落下位置
-
-            dot.animate([
-                { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
-                { transform: `translate(${tx}px, ${ty}px) scale(0.5) rotate(${Math.random() * 720}deg)`, opacity: 0 }
-            ], { 
-                duration: 2000 + Math.random() * 1000, 
-                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)' 
-            });
-
-            // 動畫結束後移除元素，節省效能
-            setTimeout(() => dot.remove(), 3000);
-        }
+    async function fetchData() { 
+        dataReady = false;
+        try { const r = await fetch(API_URL); fortuneSheetData = await r.json(); dataReady = true; } catch (e) { console.error(e); } 
     }
 
-    // 在 handleCopyClick 成功拿到序號後呼叫
+    function resize() {
+        const s = Math.min(window.innerWidth / 720, window.innerHeight / 1280);
+        document.getElementById('game-stage').style.transform = `translate(-50%, -50%) scale(${s})`;
+    }
+    window.onload = resize; window.onresize = resize;
+
+    function handleStartDraw() {
+        if (isDrawing) return;
+        document.getElementById('btn-draw').classList.add('hidden');
+        startDrawing();
+    }
+
+    function startDrawing() {
+        isDrawing = true;
+        document.getElementById('char-cat').className = 'shaking';
+        fetchData();
+        setTimeout(() => { 
+            if(dataReady) showResult(); 
+            else { 
+                let i = setInterval(() => { if(dataReady) { clearInterval(i); showResult(); } }, 100); 
+            } 
+        }, 2500);
+    }
+
+    function showResult() {
+        document.getElementById('char-cat').className = 'breathing';
+        const force = document.getElementById('debug-force-type').value;
+        const result = (force !== "none") ? fortuneSheetData.find(d => d.type.trim() === force) : fortuneSheetData[Math.floor(Math.random()*fortuneSheetData.length)];
+        
+        const isSuper = result.type.trim() === "超金運";
+        document.getElementById('res-type-img').src = `assets/${isSuper ? "supergold" : "gold"}.webp`;
+        document.getElementById('res-destiny').innerText = result.destiny;
+        document.getElementById('res-career').innerText = result.career;
+        document.getElementById('res-love').innerText = result.love;
+        document.getElementById('scroll-container').classList.add('active');
+
+        setTimeout(() => {
+            document.getElementById('res-type-img').classList.add('show');
+            document.getElementById('btn-share').classList.remove('hidden');
+            if (isSuper) {
+                document.getElementById('btn-copy').classList.remove('hidden');
+                document.getElementById('serial-container').style.opacity = "1";
+            } else {
+                document.getElementById('btn-redraw').classList.remove('hidden');
+            }
+        }, 800);
+    }
+
     async function handleCopyClick() {
         const serialEl = document.getElementById('serial-text');
         serialEl.innerText = "領取中...";
         try {
-            const response = await fetch(`${API_URL}?action=claim`);
-            const serialCode = await response.text();
-            if (serialCode && serialCode !== "") {
-                serialEl.innerText = serialCode;
-                
-                // 執行複製
+            const r = await fetch(`${API_URL}?action=claim`);
+            const code = await r.text();
+            if (code) {
+                serialEl.innerText = code;
                 const el = document.createElement('textarea');
-                el.value = serialCode;
+                el.value = code;
                 document.body.appendChild(el); el.select();
                 document.execCommand('copy');
                 document.body.removeChild(el);
-
-                // 視覺回饋：噴彩帶 + 按鈕切換
-                spawnConfetti(); 
                 document.getElementById('btn-copy').classList.add('hidden');
                 document.getElementById('btn-reward').classList.remove('hidden');
             } else {
                 serialEl.innerText = "序號已領完";
             }
-        } catch (e) { serialEl.innerText = "網路異常"; }
+        } catch (e) { serialEl.innerText = "連線失敗"; }
     }
+
+    // 重抽邏輯優化：直接進入 startDrawing() 流程
+    function handleReset() {
+        isDrawing = false;
+        // 隱藏所有結果按鈕
+        document.querySelectorAll('.left-btn, #btn-share').forEach(b => b.classList.add('hidden'));
+        // 關閉捲軸並重置視覺
+        document.getElementById('scroll-container').classList.remove('active');
+        document.getElementById('res-type-img').classList.remove('show');
+        document.getElementById('serial-container').style.opacity = "0";
+        document.getElementById('serial-text').innerText = "點擊複製領取序號";
+        
+        // 延遲一點點讓捲軸縮回動畫跑完，然後直接觸發抽籤
+        setTimeout(startDrawing, 500);
+    }
+
+    function handleRewardClick() { window.location.href = "https://line.me/R/ti/p/@你的ID"; }
+    function handleShare() { alert("祝您好運！"); }
 </script>
+</body>
+</html>
