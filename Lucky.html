@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V1.9</title>
+    <title>吉運臨門 - Pixel GD V2.2</title>
     <style>
-        /* 1. 全域環境與縮放容器 */
+        /* 基礎環境與縮放容器 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
         #game-stage { position: absolute; width: 720px; height: 1280px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1); transform-origin: center; background-color: #b71c1c; overflow: hidden; }
         .layer { position: absolute; transform: translate(-50%, -50%); pointer-events: none; user-select: none; }
         .interactive { pointer-events: auto; cursor: pointer; }
 
-        /* 2. 圖層定位 (依據 PS 座標) */
+        /* 圖層定位 (PS 座標) */
         #bg-main { left: 360px; top: 640px; width: 720px; z-index: 1; }
         #char-cat { left: 384px; top: 745px; width: 515px; z-index: 50; }
         #scroll-container { position: absolute; left: 360px; top: 725px; width: 708px; height: 855px; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 100; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
         #scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         #scroll-bg { width: 100%; height: 100%; top: 50%; left: 50%; }
 
-        /* 按鈕座標：抽籤按鈕(初始) / 重抽與分享(結果) */
+        /* 按鈕座標 */
         #btn-draw { left: 352px; top: 1158px; width: 333px; z-index: 200; }
         #btn-redraw { left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
         #btn-share { left: 491px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
 
-        /* 3. 直書文字區 (鎖定頂部 300px) */
-        #res-type-img { left: 50%; top: 160px; width: 320px; z-index: 110; } 
+        /* 吉類貼圖 - 精確中心點座標 x355, y445 */
+        #res-type-img { 
+            left: 355px; 
+            top: 445px; 
+            /* 寬度會根據圖片自動縮放，最大設為 200px 確保超金運能完整顯示 */
+            max-width: 200px; 
+            z-index: 110; 
+        } 
+
+        /* 文字排版區 (鎖定頂部 300px) */
         .fortune-text { 
             position: absolute; z-index: 110; color: #3e2723; 
             font-family: "Microsoft JhengHei", sans-serif; font-weight: bold;
@@ -34,12 +42,11 @@
             justify-content: flex-start; align-items: center;
             transform: translateX(-50%); height: 420px; overflow: hidden; 
         }
-        /* 本命區支援兩排，其餘單排 */
         #res-destiny { left: 478px; top: 300px; width: 85px; white-space: normal; }
         #res-career  { left: 331px; top: 300px; width: 45px; white-space: nowrap; }
         #res-love    { left: 204px; top: 300px; width: 45px; white-space: nowrap; }
 
-        /* 4. 動效與狀態 */
+        /* 特效與狀態 */
         .shaking { animation: shakeLoop 0.15s infinite; }
         @keyframes shakeLoop { 0%, 100% { transform: translate(-50%, -50%) rotate(0deg); } 25% { transform: translate(-50%, -52%) rotate(3deg); } 75% { transform: translate(-50%, -52%) rotate(-3deg); } }
         .hidden { display: none !important; }
@@ -72,7 +79,15 @@
     let dataReady = false;
     let currentResult = null;
 
-    // 現場抓取資料函式
+    const typeFileMap = {
+        "超金運": "suppergold",
+        "大吉": "biggold",
+        "中吉": "middlegold",
+        "小吉": "smallgold",
+        "吉": "commongold",
+        "中平": "gold"
+    };
+
     async function fetchDataOnTheFly() {
         dataReady = false;
         try {
@@ -91,17 +106,13 @@
     window.addEventListener('resize', resizeGame);
     window.onload = () => { resizeGame(); };
 
-    // 啟動抽籤流程
     function startDrawingProcess() {
         isDrawing = true;
         document.getElementById('char-cat').classList.add('shaking');
-        
-        // 抖動開始時才抓資料
         fetchDataOnTheFly();
 
         const startTime = Date.now();
         const checkInterval = setInterval(() => {
-            // 必須抖滿 2.5 秒且資料到位
             if (Date.now() - startTime >= 2500 && dataReady) {
                 clearInterval(checkInterval);
                 showResult();
@@ -120,7 +131,8 @@
         currentResult = fortuneSheetData[Math.floor(Math.random() * fortuneSheetData.length)];
         
         const typeImg = document.getElementById('res-type-img');
-        typeImg.src = `assets/type_${currentResult.type}.webp`;
+        const englishFileName = typeFileMap[currentResult.type.trim()] || "gold"; 
+        typeImg.src = `assets/${englishFileName}.webp`;
         typeImg.classList.remove('hidden');
 
         document.getElementById('res-destiny').innerText = currentResult.destiny;
@@ -140,39 +152,27 @@
         document.getElementById('btn-share').classList.add('hidden');
         document.getElementById('scroll-container').classList.remove('active');
         document.getElementById('res-type-img').classList.add('hidden');
-        
-        // 縮回後自動開始下一次抽籤
         setTimeout(() => { startDrawingProcess(); }, 400); 
     }
 
-    // 分享功能 (含 LINE 優化)
     function handleShare() {
-        const shareText = `吉運臨門！我抽到了：【${currentResult.type}】`;
+        const shareText = `吉運臨門！我今天抽到了：【${currentResult.type}】`;
         const shareUrl = window.location.href;
-        const fullMessage = `${shareText}\n快來測測你的運勢：${shareUrl}`;
-
+        const fullMessage = `${shareText}\n快來測測你的新春運勢：${shareUrl}`;
         const isLine = navigator.userAgent.includes("Line");
 
         if (isLine) {
-            // LINE URL Scheme 方案
-            const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(fullMessage)}`;
-            window.location.href = lineUrl;
+            window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(fullMessage)}`;
         } else if (navigator.share) {
-            // 原生 Web Share 方案
-            navigator.share({
-                title: '吉運臨門 - Pixel GD',
-                text: shareText,
-                url: shareUrl
-            }).catch(e => console.log("Share failed", e));
+            navigator.share({ title: '吉運臨門 - Pixel GD', text: shareText, url: shareUrl }).catch(e => console.log(e));
         } else {
-            // 備案：自動複製
             const temp = document.createElement("textarea");
             temp.value = fullMessage;
             document.body.appendChild(temp);
             temp.select();
             document.execCommand("copy");
             document.body.removeChild(temp);
-            alert("連結已複製，快傳給朋友吧！");
+            alert("連結已複製！");
         }
     }
 </script>
