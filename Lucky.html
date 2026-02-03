@@ -3,54 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V4.4</title>
+    <title>吉運臨門 - Pixel JD V4.5</title>
     <style>
-        /* 基礎環境 */
+        /* 基礎環境與 720x1280 容器 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
         #game-stage { position: absolute; width: 720px; height: 1280px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1); transform-origin: center; background-color: #b71c1c; overflow: hidden; }
         
         .layer { position: absolute; pointer-events: none; user-select: none; }
         .interactive { pointer-events: auto; cursor: pointer; }
 
-        /* 背景與標語 */
         #bg-main { left: 0; top: 0; width: 720px; z-index: 1; }
         #slogan { left: 75px; top: 95px; width: 561px; height: 209px; z-index: 60; }
 
-        /* --- 貓咪容器方案 (解決 iOS 掉落問題) --- */
+        /* --- 貓咪容器方案 --- */
         #cat-wrapper { 
             left: 384px; top: 745px; width: 515px; z-index: 50;
-            transform: translate(-50%, -50%); /* 這裡只負責精確定位 */
+            transform: translate(-50%, -50%); 
         }
-        #char-cat { width: 100%; height: auto; display: block; }
+        #char-cat { width: 100%; height: auto; display: block; transform-origin: bottom; } /* 以底部為中心縮放 */
 
-        /* 呼吸動畫：只針對圖片本身縮放，不影響外層定位 */
+        /* 待機呼息 (慢速) */
         .breathing { animation: breathLoop 3s ease-in-out infinite; }
         @keyframes breathLoop {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02) translateY(-10px); }
+            0%, 100% { transform: scale(1, 1); }
+            50% { transform: scale(1.02, 0.98); } /* 稍微變寬壓扁 */
         }
 
-        /* 抖動動畫 */
-        .shaking { animation: shakeLoop 0.15s infinite; }
-        @keyframes shakeLoop { 
-            0%, 100% { transform: rotate(0deg); } 
-            25% { transform: rotate(3deg) translateY(-5px); } 
-            75% { transform: rotate(-3deg) translateY(-5px); } 
+        /* 關鍵修正：按下抽籤時的上下縮放 (快速蓄力) */
+        .stretching { animation: stretchLoop 0.15s infinite ease-in-out; }
+        @keyframes stretchLoop { 
+            0%, 100% { transform: scale(1, 1); }
+            50% { transform: scale(0.95, 1.15); } /* 變窄伸長，產生彈跳感 */
         }
 
-        /* 煙火綻放 */
+        /* 煙火與捲軸 */
         .firework { width: 194px; height: 200px; z-index: 10; opacity: 0; }
         .fw-loop { animation: fw绽放 2s infinite ease-out; }
         #fw-1 { left: 31px; top: 441px; }
         #fw-2 { left: 680px; top: 464px; animation-delay: 1s; }
-        @keyframes fw绽放 {
-            0% { transform: scale(0); opacity: 0; }
-            20% { opacity: 1; }
-            70% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
+        @keyframes fw绽放 { 0% { transform: scale(0); opacity: 0; } 20% { opacity: 1; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
-        /* 捲軸與貼圖 */
         #scroll-container { 
             left: 360px; top: 725px; width: 708px; height: 855px; z-index: 100;
             opacity: 0; transform: translate(-50%, -50%) scale(0);
@@ -84,7 +76,7 @@
     <img id="fw-2" class="layer firework fw-loop" src="assets/firework.webp">
 
     <div id="cat-wrapper" class="layer">
-        <img id="char-cat" class="breathing" src="assets/char_cat.webp">
+        <img id="char-cat" class="breathing" src="assets/cat_shake_001.webp">
     </div>
 
     <div id="scroll-container" class="layer">
@@ -133,7 +125,7 @@
         isDrawing = true;
         const catImg = document.getElementById('char-cat');
         catImg.classList.remove('breathing');
-        catImg.classList.add('shaking');
+        catImg.classList.add('stretching'); // 切換到快速上下縮放
         fetchDataOnTheFly();
 
         const startTime = Date.now();
@@ -147,7 +139,7 @@
 
     function showResult() {
         const catImg = document.getElementById('char-cat');
-        catImg.classList.remove('shaking');
+        catImg.classList.remove('stretching');
         catImg.classList.add('breathing');
         
         currentResult = fortuneSheetData[Math.floor(Math.random() * fortuneSheetData.length)];
