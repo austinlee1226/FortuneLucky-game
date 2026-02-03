@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel JD V4.24</title>
+    <title>吉運臨門 - Pixel GD</title>
     <style>
         /* 基礎設定與畫布定位 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
@@ -11,7 +11,7 @@
         .layer { position: absolute; pointer-events: none; user-select: none; }
         .interactive { pointer-events: auto; cursor: pointer; }
 
-        /* Debug UI (發布前請刪除) */
+        /* 備註：正式發布時可將此 debug-ui 整塊刪除 */
         #debug-ui { position: absolute; top: 20px; left: 20px; z-index: 999; background: rgba(0,0,0,0.8); color: #00ff00; padding: 15px; border-radius: 5px; pointer-events: auto; font-family: monospace; }
 
         /* 背景、標語與煙火 */
@@ -61,7 +61,7 @@
 <body>
 
 <div id="debug-ui">
-    [DEBUG] Pixel JD <br>
+    [DEBUG] Pixel GD <br>
     <select id="debug-force-type">
         <option value="none">隨機選取</option>
         <option value="超金運">測試：超金運</option>
@@ -165,10 +165,10 @@
             if (code) {
                 serialEl.innerText = code;
                 const el = document.createElement('textarea');
-                el.value = code;
-                document.body.appendChild(el); el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
+                el.value = code; document.body.appendChild(el); el.select();
+                document.execCommand('copy'); document.body.removeChild(el);
+                
+                // 按鈕變身：隱藏複製，顯示前往領獎
                 document.getElementById('btn-copy').classList.add('hidden');
                 document.getElementById('btn-reward').classList.remove('hidden');
             } else {
@@ -187,22 +187,16 @@
         setTimeout(startDrawing, 500);
     }
 
-    // 整合 Web Share 與 LINE URL Scheme
     function handleShare() {
         const type = document.getElementById('res-type-img').src.includes('supergold') ? "【超金運】" : "【好運】";
         const destiny = document.getElementById('res-destiny').innerText;
-        const msg = `🧧 吉運臨門！我抽到了 ${type}\n✨ 我的今日運勢：${destiny}\n🎮 快來 Pixel JD 抽你的新春好運：${window.location.href}`;
+        const msg = `🧧 吉運臨門！我抽到了 ${type}\n✨ 我的今日運勢：${destiny}\n🎮 快來 Pixel GD 抽你的新春好運：${window.location.href}`;
 
-        // 1. 如果在 LINE 內建瀏覽器，直接用 URL Scheme
         if (navigator.userAgent.indexOf('Line') > -1) {
             window.location.href = `https://line.me/R/share?text=${encodeURIComponent(msg)}`;
-        } 
-        // 2. 否則嘗試 Web Share API
-        else if (navigator.share) {
-            navigator.share({ title: '吉運臨門 - Pixel JD', text: msg, url: window.location.href }).catch(() => {});
-        } 
-        // 3. 最後備案：複製到剪貼簿
-        else {
+        } else if (navigator.share) {
+            navigator.share({ title: '吉運臨門', text: msg, url: window.location.href }).catch(() => {});
+        } else {
             const el = document.createElement('textarea');
             el.value = msg; document.body.appendChild(el); el.select();
             document.execCommand('copy'); document.body.removeChild(el);
@@ -210,7 +204,10 @@
         }
     }
 
-    function handleRewardClick() { window.location.href = "https://line.me/R/ti/p/@你的ID"; }
+    // 當玩家點擊 btn_get_reward 時觸發，導向 Line OA
+    function handleRewardClick() { 
+        window.location.href = "https://line.me/R/ti/p/@587geufc"; 
+    }
 </script>
 </body>
 </html>
