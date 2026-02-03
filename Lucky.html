@@ -3,24 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V3.4</title>
+    <title>吉運臨門 - Pixel GD V3.5</title>
     <style>
-        /* 1. 基礎環境與縮放容器 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
         #game-stage { position: absolute; width: 720px; height: 1280px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1); transform-origin: center; background-color: #b71c1c; overflow: hidden; }
         
-        /* 基礎圖層：預設左上角定位 (0,0) */
         .layer { position: absolute; pointer-events: none; user-select: none; }
-        
-        /* 中心對齊物件專用 */
         .center-obj { transform: translate(-50%, -50%); }
         .interactive { pointer-events: auto; cursor: pointer; }
 
-        /* 背景與角色座標 */
         #bg-main { left: 0; top: 0; width: 720px; z-index: 1; }
         #char-cat { left: 384px; top: 745px; width: 515px; z-index: 50; }
 
-        /* 捲軸容器：中心點座標 (360, 725) */
+        /* 捲軸容器 (中心點 360, 725) */
         #scroll-container { 
             left: 360px; top: 725px; width: 708px; height: 855px; z-index: 100;
             opacity: 0; transform: translate(-50%, -50%) scale(0);
@@ -28,14 +23,14 @@
         }
         #scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 
-        /* 吉類貼圖 - 實測座標 (x355, y150) 與淡入動效 */
+        /* 吉類貼圖 - 實測座標 (x355, y150) */
         #res-type-img { 
             left: 355px; top: 150px; width: auto; max-width: 250px; z-index: 150; 
             opacity: 0; transition: opacity 0.6s ease-out; 
         }
         #res-type-img.show { opacity: 1; }
 
-        /* 2. 文字排版區 (鎖定頂部 300px) */
+        /* 文字排版區 (頂部 300px) */
         .fortune-text { 
             position: absolute; z-index: 110; color: #3e2723; 
             font-family: "Microsoft JhengHei", sans-serif; font-weight: bold;
@@ -46,19 +41,18 @@
             transform: translateX(-50%); height: 420px; overflow: hidden; 
         }
 
-        /* 本命區：修正座標為 453px，寬度維持 85px */
-        #res-destiny { left: 453px; top: 300px; width: 85px; white-space: normal; }
+        /* 本命區：修正座標 453px，實測寬度 110px */
+        #res-destiny { left: 453px; top: 300px; width: 110px; white-space: normal; }
         
-        /* 事業與戀愛區：座標維持不變，寬度 85px */
+        /* 事業與戀愛區 */
         #res-career  { left: 331px; top: 300px; width: 85px; white-space: normal; }
         #res-love    { left: 204px; top: 300px; width: 85px; white-space: normal; }
 
-        /* 3. 按鈕座標 */
+        /* 按鈕座標 */
         #btn-draw { left: 352px; top: 1158px; width: 333px; z-index: 200; }
         #btn-redraw { left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
         #btn-share { left: 491px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
 
-        /* 動效設定 */
         .shaking { animation: shakeLoop 0.15s infinite; }
         @keyframes shakeLoop { 0%, 100% { transform: translate(-50%, -50%) rotate(0deg); } 25% { transform: translate(-50%, -52%) rotate(3deg); } 75% { transform: translate(-50%, -52%) rotate(-3deg); } }
         .hidden { display: none !important; }
@@ -91,7 +85,6 @@
     let dataReady = false;
     let currentResult = null;
 
-    // 依據 GitHub 實際檔名進行對照
     const typeFileMap = {
         "超金運": "suppergold", "大吉": "biggold", "中吉": "middlegold",
         "小吉": "smallgold", "吉": "commongold", "中平": "gold"
@@ -147,13 +140,10 @@
         document.getElementById('res-career').innerText = currentResult.career;
         document.getElementById('res-love').innerText = currentResult.love;
 
-        // 1. 捲軸展開
         document.getElementById('scroll-container').classList.add('active');
         
-        // 2. 延遲淡入貼圖
         setTimeout(() => { typeImg.classList.add('show'); }, 600); 
 
-        // 3. 延遲顯示按鈕
         setTimeout(() => {
             document.getElementById('btn-redraw').classList.remove('hidden');
             document.getElementById('btn-share').classList.remove('hidden');
@@ -169,13 +159,11 @@
     }
 
     function handleShare() {
-        const shareText = `吉運臨門！我今天抽到了：【${currentResult.type}】`;
-        const shareUrl = window.location.href;
-        const fullMessage = `${shareText}\n快來測測你的新春運勢：${shareUrl}`;
+        const fullMessage = `吉運臨門！我抽到了：【${currentResult.type}】\n${window.location.href}`;
         if (navigator.userAgent.includes("Line")) {
             window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(fullMessage)}`;
         } else if (navigator.share) {
-            navigator.share({ title: '吉運臨門 - Pixel GD', text: shareText, url: shareUrl }).catch(e => console.log(e));
+            navigator.share({ title: '吉運臨門', text: fullMessage }).catch(e => console.log(e));
         } else {
             alert("連結已複製到剪貼簿！");
         }
