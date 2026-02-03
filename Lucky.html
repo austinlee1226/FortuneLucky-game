@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V4.4</title>
+    <title>吉運臨門 - Pixel GD V4.8</title>
     <style>
         /* 基礎環境 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
@@ -19,11 +19,11 @@
         /* --- 貓咪容器方案 (解決 iOS 掉落問題) --- */
         #cat-wrapper { 
             left: 384px; top: 745px; width: 515px; z-index: 50;
-            transform: translate(-50%, -50%); /* 這裡只負責精確定位 */
+            transform: translate(-50%, -50%); 
         }
         #char-cat { width: 100%; height: auto; display: block; }
 
-        /* 呼吸動畫：只針對圖片本身縮放，不影響外層定位 */
+        /* 呼吸動畫 */
         .breathing { animation: breathLoop 3s ease-in-out infinite; }
         @keyframes breathLoop {
             0%, 100% { transform: scale(1); }
@@ -107,7 +107,15 @@
     let dataReady = false;
     let currentResult = null;
 
-    const typeFileMap = { "超金運": "suppergold", "大吉": "biggold", "中吉": "middlegold", "小吉": "smallgold", "吉": "commongold", "中平": "gold" };
+    // 已修正超金運檔名
+    const typeFileMap = { 
+        "超金運": "supergold", 
+        "大吉": "biggold", 
+        "中吉": "middlegold", 
+        "小吉": "smallgold", 
+        "吉": "commongold", 
+        "中平": "gold" 
+    };
 
     async function fetchDataOnTheFly() {
         dataReady = false;
