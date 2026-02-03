@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel JD V4.13</title>
+    <title>吉運臨門 - Pixel JD V4.14 (Debug Mode)</title>
     <style>
         /* 基礎環境與畫布設定 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
@@ -11,18 +11,15 @@
         .layer { position: absolute; pointer-events: none; user-select: none; }
         .interactive { pointer-events: auto; cursor: pointer; }
 
+        /* Debug UI 樣式 */
+        #debug-ui { position: absolute; top: 20px; left: 20px; z-index: 999; background: rgba(0,0,0,0.8); color: #00ff00; padding: 15px; font-family: monospace; border: 1px solid #00ff00; border-radius: 5px; pointer-events: auto; }
+        #debug-ui select { background: #333; color: #fff; border: 1px solid #666; padding: 5px; margin-top: 10px; }
+
         /* 背景與物件座標 */
         #bg-main { left: 0; top: 0; width: 720px; z-index: 1; }
         #slogan { left: 75px; top: 95px; width: 561px; height: 209px; z-index: 60; }
         #cat-wrapper { left: 384px; top: 745px; width: 515px; z-index: 50; transform: translate(-50%, -50%); }
         #char-cat { width: 100%; height: auto; display: block; }
-
-        /* 煙火座標 (x31, y350) & (x500, y464) */
-        .firework { width: 194px; height: 200px; z-index: 10; opacity: 0; }
-        .fw-loop { animation: fw绽放 2s infinite ease-out; }
-        #fw-1 { left: 31px; top: 350px; }
-        #fw-2 { left: 500px; top: 464px; animation-delay: 1s; }
-        @keyframes fw绽放 { 0% { transform: scale(0); opacity: 0; } 20% { opacity: 1; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
         /* 捲軸容器 */
         #scroll-container { left: 360px; top: 725px; width: 708px; height: 855px; z-index: 100; opacity: 0; transform: translate(-50%, -50%) scale(0); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -58,12 +55,19 @@
 </head>
 <body>
 
+<div id="debug-ui">
+    [DEBUG] Pixel JD 測試台<br>
+    <select id="debug-force-type">
+        <option value="none">隨機選取</option>
+        <option value="超金運">測試：超金運 (限量)</option>
+        <option value="大吉">測試：大吉</option>
+    </select>
+</div>
+
 <div id="game-stage">
     <img id="bg-main" class="layer" src="assets/bg_main.webp">
     <img id="slogan" class="layer" src="assets/slogan.webp">
-    <img id="fw-1" class="layer firework fw-loop" src="assets/firework.webp">
-    <img id="fw-2" class="layer firework fw-loop" src="assets/firework.webp">
-
+    
     <div id="cat-wrapper" class="layer">
         <img id="char-cat" class="breathing" src="assets/char_cat.webp">
     </div>
@@ -88,7 +92,6 @@
 </div>
 
 <script>
-    // 使用你剛複製的正確 Web App 網址
     const API_URL = "https://script.google.com/macros/s/AKfycbyfeuBAEJ8TZeP9beZj2cjWHKLIvzbZjJxZE6F5k6tfMnOmZLeLyJI7cg-f9xHu8vz6_w/exec";
     let fortuneSheetData = [];
     let isDrawing = false;
@@ -123,9 +126,17 @@
 
     function showResult() {
         document.getElementById('char-cat').className = 'breathing';
-        // 隨機選取籤詩
-        currentResult = fortuneSheetData[Math.floor(Math.random()*fortuneSheetData.length)];
         
+        // Debug 判定
+        const force = document.getElementById('debug-force-type').value;
+        if (force !== "none") {
+            currentResult = fortuneSheetData.find(d => d.type.trim() === force);
+        } else {
+            currentResult = fortuneSheetData[Math.floor(Math.random()*fortuneSheetData.length)];
+        }
+        
+        if (!currentResult) { alert("找不到該類型的籤詩，請檢查試算表內容！"); return; }
+
         document.getElementById('res-type-img').src = `assets/${typeFileMap[currentResult.type.trim()] || "gold"}.webp`;
         document.getElementById('res-destiny').innerText = currentResult.destiny;
         document.getElementById('res-career').innerText = currentResult.career;
@@ -145,34 +156,32 @@
         }, 800);
     }
 
-    // 從後端領取序號並複製
     async function handleCopyClick() {
         const serialEl = document.getElementById('serial-text');
-        serialEl.innerText = "領取中...";
+        serialEl.innerText = "序號核對中...";
         try {
             const response = await fetch(`${API_URL}?action=claim`);
             const serialCode = await response.text();
             if (serialCode && serialCode !== "") {
                 serialEl.innerText = serialCode;
-                // 自動複製到剪貼簿
+                // 自動複製
                 const el = document.createElement('textarea');
                 el.value = serialCode;
                 document.body.appendChild(el); el.select();
                 document.execCommand('copy');
                 document.body.removeChild(el);
-                alert("序號已複製：" + serialCode);
-                // 切換為領獎按鈕
+                alert("序號 " + serialCode + " 已複製，請前往 Line 領獎！");
+                
                 document.getElementById('btn-copy').classList.add('hidden');
                 document.getElementById('btn-reward').classList.remove('hidden');
             } else {
-                serialEl.innerText = "序號已領完";
+                serialEl.innerText = "序號已全數領完";
             }
-        } catch (e) { serialEl.innerText = "連線失敗"; }
+        } catch (e) { serialEl.innerText = "系統繁忙"; }
     }
 
     function handleRewardClick() {
-        // 預留 Line OA 跳轉
-        window.location.href = "https://line.me/R/ti/p/@你的ID"; 
+        window.location.href = "https://line.me/R/ti/p/@你的ID"; // 請換成你的 Line ID
     }
 
     function handleReset() {
