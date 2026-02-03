@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V2.2</title>
+    <title>吉運臨門 - Pixel GD V2.6</title>
     <style>
         /* 基礎環境與縮放容器 */
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
@@ -23,13 +23,14 @@
         #btn-redraw { left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
         #btn-share { left: 491px; top: 1158px; width: 262px; height: 76px; z-index: 210; }
 
-        /* 吉類貼圖 - 精確中心點座標 x355, y445 */
+        /* 吉類貼圖 - 精確中心點座標 x355, y445 (提昇層級確保顯示) */
         #res-type-img { 
             left: 355px; 
             top: 445px; 
-            /* 寬度會根據圖片自動縮放，最大設為 200px 確保超金運能完整顯示 */
-            max-width: 200px; 
-            z-index: 110; 
+            width: auto;
+            max-width: 250px; 
+            z-index: 150; 
+            display: block;
         } 
 
         /* 文字排版區 (鎖定頂部 300px) */
@@ -79,6 +80,7 @@
     let dataReady = false;
     let currentResult = null;
 
+    // 定義中文類別與英文檔名的對照表
     const typeFileMap = {
         "超金運": "suppergold",
         "大吉": "biggold",
@@ -94,6 +96,7 @@
             const response = await fetch(API_URL);
             fortuneSheetData = await response.json();
             dataReady = true;
+            console.log("Pixel GD: 資料抓取成功");
         } catch (err) { console.error("API Error", err); }
     }
 
@@ -132,8 +135,14 @@
         
         const typeImg = document.getElementById('res-type-img');
         const englishFileName = typeFileMap[currentResult.type.trim()] || "gold"; 
+        
+        // 1. 設定 src
         typeImg.src = `assets/${englishFileName}.webp`;
-        typeImg.classList.remove('hidden');
+        
+        // 2. 確保圖片加載後才顯示
+        typeImg.onload = () => {
+            typeImg.classList.remove('hidden');
+        };
 
         document.getElementById('res-destiny').innerText = currentResult.destiny;
         document.getElementById('res-career').innerText = currentResult.career;
@@ -172,7 +181,7 @@
             temp.select();
             document.execCommand("copy");
             document.body.removeChild(temp);
-            alert("連結已複製！");
+            alert("連結已複製到剪貼簿！");
         }
     }
 </script>
