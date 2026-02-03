@@ -1,154 +1,30 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>吉運臨門 - Pixel GD V4.10</title>
-    <style>
-        /* 基礎環境 */
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; display: flex; justify-content: center; align-items: center; }
-        #game-stage { position: absolute; width: 720px; height: 1280px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1); transform-origin: center; background-color: #b71c1c; overflow: hidden; }
-        
-        .layer { position: absolute; pointer-events: none; user-select: none; }
-        .interactive { pointer-events: auto; cursor: pointer; }
-
-        /* Debug UI */
-        #debug-ui { position: absolute; top: 10px; left: 10px; z-index: 999; background: rgba(0,0,0,0.7); color: #fff; padding: 10px; font-size: 14px; border-radius: 5px; pointer-events: auto; }
-        #debug-ui select { font-size: 16px; margin-top: 5px; }
-
-        /* 背景與標語 (x75, y95) */
-        #bg-main { left: 0; top: 0; width: 720px; z-index: 1; }
-        #slogan { left: 75px; top: 95px; width: 561px; height: 209px; z-index: 60; }
-
-        /* 貓咪容器 (x384, y745) */
-        #cat-wrapper { left: 384px; top: 745px; width: 515px; z-index: 50; transform: translate(-50%, -50%); }
-        #char-cat { width: 100%; height: auto; display: block; }
-
-        /* 呼吸動畫 */
-        .breathing { animation: breathLoop 3s ease-in-out infinite; }
-        @keyframes breathLoop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02) translateY(-10px); } }
-
-        /* 抖動動畫 */
-        .shaking { animation: shakeLoop 0.15s infinite; }
-        @keyframes shakeLoop { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(3deg) translateY(-5px); } 75% { transform: rotate(-3deg) translateY(-5px); } }
-
-        /* --- 煙火座標更新區 --- */
-        .firework { width: 194px; height: 200px; z-index: 10; opacity: 0; }
-        .fw-loop { animation: fw绽放 2s infinite ease-out; }
-        #fw-1 { left: 31px; top: 350px; } /* 更新 top: 350px */
-        #fw-2 { left: 500px; top: 464px; animation-delay: 1s; } /* 更新 left: 500px */
-
-        @keyframes fw绽放 { 0% { transform: scale(0); opacity: 0; } 20% { opacity: 1; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
-
-        /* 捲軸與結果 */
-        #scroll-container { left: 360px; top: 725px; width: 708px; height: 855px; z-index: 100; opacity: 0; transform: translate(-50%, -50%) scale(0); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        #scroll-container.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        #res-type-img { left: 355px; top: 150px; width: auto; max-width: 250px; z-index: 150; opacity: 0; transform: translate(-50%, -50%); transition: opacity 0.6s ease-out; }
-        #res-type-img.show { opacity: 1; }
-
-        /* 文字容器 (本命 453px / 110px) */
-        .fortune-text { position: absolute; z-index: 110; color: #3e2723; font-family: "Microsoft JhengHei", sans-serif; font-weight: bold; line-height: 1.5; font-size: 26px; writing-mode: vertical-rl; text-orientation: upright; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transform: translateX(-50%); height: 420px; overflow: hidden; }
-        #res-destiny { left: 453px; top: 300px; width: 110px; white-space: normal; }
-        #res-career  { left: 331px; top: 300px; width: 85px; white-space: normal; }
-        #res-love    { left: 204px; top: 300px; width: 85px; white-space: normal; }
-
-        /* 按鈕座標 (x352, y1158) */
-        #btn-draw { left: 352px; top: 1158px; width: 333px; z-index: 200; transform: translate(-50%, -50%); }
-        #btn-redraw { left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 210; transform: translate(-50%, -50%); }
-        #btn-share { left: 491px; top: 1158px; width: 262px; height: 76px; z-index: 210; transform: translate(-50%, -50%); }
-
-        .hidden { display: none !important; }
-        .btn-active:active { transform: translate(-50%, -50%) scale(0.92); filter: brightness(1.1); }
-    </style>
-</head>
-<body>
-
-<div id="debug-ui">
-    測試模式：<br>
-    <select id="debug-force-type">
-        <option value="none">隨機抽取</option>
-        <option value="超金運">必中：超金運</option>
-        <option value="大吉">必中：大吉</option>
-        <option value="中吉">必中：中吉</option>
-        <option value="小吉">必中：小吉</option>
-        <option value="吉">必中：吉</option>
-        <option value="中平">必中：中平</option>
-    </select>
-</div>
+<style>
+    /* 這裡加入新按鈕的座標設定，與 redraw 相同 */
+    #btn-copy, #btn-reward { 
+        left: 233px; top: 1158px; width: 262px; height: 76px; z-index: 220; 
+        transform: translate(-50%, -50%); 
+    }
+</style>
 
 <div id="game-stage">
-    <img id="bg-main" class="layer" src="assets/bg_main.webp">
-    <img id="slogan" class="layer" src="assets/slogan.webp">
-    <img id="fw-1" class="layer firework fw-loop" src="assets/firework.webp">
-    <img id="fw-2" class="layer firework fw-loop" src="assets/firework.webp">
-
-    <div id="cat-wrapper" class="layer">
-        <img id="char-cat" class="breathing" src="assets/char_cat.webp">
-    </div>
-
-    <div id="scroll-container" class="layer">
-        <img id="scroll-bg" class="layer" src="assets/scroll_bg.webp" style="width:100%; height:100%; left:0; top:0;">
-        <img id="res-type-img" class="layer" src="">
-        <div id="res-destiny" class="fortune-text"></div>
-        <div id="res-career" class="fortune-text"></div>
-        <div id="res-love" class="fortune-text"></div>
-    </div>
-
     <img id="btn-draw" class="layer interactive btn-active" src="assets/btn_draw.webp" onclick="handleStartDraw()">
+    
     <img id="btn-redraw" class="layer interactive btn-active hidden" src="assets/btn_redraw.webp" onclick="handleReset()">
+    <img id="btn-copy" class="layer interactive btn-active hidden" src="assets/btn_copy.webp" onclick="handleCopyClick()">
+    <img id="btn-reward" class="layer interactive btn-active hidden" src="assets/btn_get_reward.webp" onclick="handleRewardClick()">
+    
     <img id="btn-share" class="layer interactive btn-active hidden" src="assets/btn_share.webp" onclick="handleShare()">
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyfeuBAEJ8TZeP9beZj2cjWHKLIvzbZjJxZE6F5k6tfMnOmZLeLyJI7cg-f9xHu8vz6_w/exec";
-    let fortuneSheetData = [];
-    let isDrawing = false;
-    let dataReady = false;
-    let currentResult = null;
-
-    const typeFileMap = { "超金運": "supergold", "大吉": "biggold", "中吉": "middlegold", "小吉": "smallgold", "吉": "commongold", "中平": "gold" };
-
-    async function fetchDataOnTheFly() {
-        dataReady = false;
-        try { const response = await fetch(API_URL); fortuneSheetData = await response.json(); dataReady = true; } catch (err) { console.error(err); }
-    }
-
-    function resizeGame() {
-        const stage = document.getElementById('game-stage');
-        const scale = Math.min(window.innerWidth / 720, window.innerHeight / 1280);
-        stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    }
-
-    window.addEventListener('resize', resizeGame);
-    window.onload = () => { resizeGame(); };
-
-    function handleStartDraw() {
-        if (isDrawing) return;
-        document.getElementById('btn-draw').classList.add('hidden');
-        startDrawingProcess();
-    }
-
-    function startDrawingProcess() {
-        isDrawing = true;
-        const catImg = document.getElementById('char-cat');
-        catImg.classList.remove('breathing');
-        catImg.classList.add('shaking');
-        fetchDataOnTheFly();
-
-        const startTime = Date.now();
-        const checkInterval = setInterval(() => {
-            if (Date.now() - startTime >= 2500 && dataReady) {
-                clearInterval(checkInterval);
-                showResult();
-            }
-        }, 100);
-    }
+    /* ... fetchData, resize 等函式維持原樣 ... */
 
     function showResult() {
         const catImg = document.getElementById('char-cat');
         catImg.classList.remove('shaking');
         catImg.classList.add('breathing');
         
+        // Debug 與 隨機邏輯
         const forceType = document.getElementById('debug-force-type').value;
         if (forceType !== "none") {
             const filtered = fortuneSheetData.filter(d => d.type.trim() === forceType);
@@ -158,40 +34,63 @@
         }
         
         const typeImg = document.getElementById('res-type-img');
-        typeImg.classList.remove('show');
         typeImg.src = `assets/${typeFileMap[currentResult.type.trim()] || "gold"}.webp`;
 
+        // 更新文字內容
         document.getElementById('res-destiny').innerText = currentResult.destiny;
         document.getElementById('res-career').innerText = currentResult.career;
         document.getElementById('res-love').innerText = currentResult.love;
 
+        // 顯示捲軸
         document.getElementById('scroll-container').classList.add('active');
-        setTimeout(() => { typeImg.classList.add('show'); }, 600); 
-        setTimeout(() => {
-            document.getElementById('btn-redraw').classList.remove('hidden');
+        
+        // --- 核心修改：超金運按鈕邏輯 ---
+        const isSuperGold = currentResult.type.trim() === "超金運";
+        
+        setTimeout(() => { 
+            typeImg.classList.add('show'); 
             document.getElementById('btn-share').classList.remove('hidden');
+            
+            if (isSuperGold) {
+                // 如果是超金運，顯示複製按鈕，隱藏重抽按鈕
+                document.getElementById('btn-copy').classList.remove('hidden');
+                document.getElementById('btn-redraw').classList.add('hidden');
+                document.getElementById('btn-reward').classList.add('hidden');
+            } else {
+                // 普通結果，顯示重抽按鈕，隱藏複製與領獎
+                document.getElementById('btn-redraw').classList.remove('hidden');
+                document.getElementById('btn-copy').classList.add('hidden');
+                document.getElementById('btn-reward').classList.add('hidden');
+            }
         }, 800);
     }
 
+    // 按下複製按鈕後的動作
+    function handleCopyClick() {
+        console.log("觸發複製動作");
+        // 先執行變換動作：隱藏自己，顯示領獎按鈕
+        document.getElementById('btn-copy').classList.add('hidden');
+        document.getElementById('btn-reward').classList.remove('hidden');
+        
+        // 這裡預留複製序號的空間，目前先不寫 code
+    }
+
+    // 按下領獎按鈕後的動作
+    function handleRewardClick() {
+        console.log("觸發領獎跳轉");
+        // 這裡預留 Line OA 跳轉空間，目前先不寫 code
+    }
+
     function handleReset() {
+        // 重設時要隱藏所有結果按鈕
         document.getElementById('btn-redraw').classList.add('hidden');
+        document.getElementById('btn-copy').classList.add('hidden');
+        document.getElementById('btn-reward').classList.add('hidden');
         document.getElementById('btn-share').classList.add('hidden');
         document.getElementById('scroll-container').classList.remove('active');
         document.getElementById('res-type-img').classList.remove('show');
         setTimeout(() => { startDrawingProcess(); }, 400); 
     }
 
-    function handleShare() {
-        const fullMessage = `吉運臨門！我抽到了：【${currentResult.type}】\n${window.location.href}`;
-        if (navigator.userAgent.includes("Line")) {
-            window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(fullMessage)}`;
-        } else if (navigator.share) {
-            navigator.share({ title: '吉運臨門', text: fullMessage }).catch(e => console.log(e));
-        } else {
-            alert("連結已複製到剪貼簿！");
-        }
-    }
+    /* ... handleShare 等其餘函式維持原樣 ... */
 </script>
-
-</body>
-</html>
